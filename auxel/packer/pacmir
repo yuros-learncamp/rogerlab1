@@ -13,9 +13,7 @@ pipewire-pulse
 pipewire-jack
 pipewire-alsa
 sddm
-yakuake
-kdeconnect
-plasma-meta
+cutefish
 qt5-declarative
 bluez
 firewalld
