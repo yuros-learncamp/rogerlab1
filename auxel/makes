@@ -64,7 +64,7 @@ function raptor_disks_make_uefi() {
 
 function raptor_disks_make_boot() {
 
-   if [[ -z $( lsblk -o label | grep "BOOT" ) ]]&&[[ -z $dualboot ]]; then
+   if [[ -z $( lsblk -o label | grep "BOOT" ) ]]; then
         echo "create boot"
         echo -e "n\np\n\n\n+2G\nt\n\n1\nw" | fdisk "$drivpath" > /dev/null 2>&1
         sleep 2
@@ -158,7 +158,7 @@ function raptor_disks_form_home() {
 }
 
 function raptor_disks_form() {
-    raptor_disks_form_uefi
+    #raptor_disks_form_uefi
     raptor_disks_form_boot
     raptor_disks_form_root
     raptor_disks_form_swap
