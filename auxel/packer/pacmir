@@ -12,8 +12,10 @@ alsa-firmware
 pipewire-pulse
 pipewire-jack
 pipewire-alsa
+sddm
 ukui
-guake
+firefox
+ghostty
 firewalld
 iptables-nft
 base
