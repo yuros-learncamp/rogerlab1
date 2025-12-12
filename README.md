@@ -7,7 +7,7 @@ pacman -Syu git
 
 ## operation
 ```
-test -d "/install" && rm -r /install
+test -d "/install" && rm /install
 ```
 ```
 git clone https://github.com/yuros-learncamp/rogerlab2.git /install
