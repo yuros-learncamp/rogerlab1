@@ -32,7 +32,8 @@ thunar-media-tags-plugin
 networkmanager
 bluez
 blueman
-bluez-utilsfirewalld
+bluez-utils
+firewalld
 iptables-nft
 base
 base-devel
