@@ -13,6 +13,7 @@ pipewire-pulse
 pipewire-jack
 pipewire-alsa
 ukui
+guake
 firewalld
 iptables-nft
 base
