@@ -123,7 +123,7 @@ function raptor_disks_prev() {
     echo "swap path : $swappath"
     echo "home path : $homepath"
     echo "--------------------------------"
-    read -p 'Type "YES" on capital letter to continue or "NO" to abort installation' confirmdiskpartition
+    read -p 'Type "YES" on capital letter to continue or "NO" to abort installation : ' confirmdiskpartition
 
     if [[ $confirmdiskpartition != "YES" ]];then
         echo "Proccess cancelation by user"
@@ -425,20 +425,16 @@ function raptor_audio_post() {
 
 
 
-function raptor_deskt_post_sess() {
-    rm -f /mnt/usr/share/wayland-sessions/labwc.desktop
-}
-
-function raptor_deskt_post_srvc() {
-    arch-chroot /mnt systemctl enable sddm.service
+function raptor_deskt_post_serve() {
+    arch-chroot /mnt systemctl enable gdm
     arch-chroot /mnt systemctl enable bluetooth.service
+    arch-chroot /mnt systemctl enable --global gcr-ssh-agent.socket
 }
 
 function raptor_deskt_post() {
     sleep 2 && clear
     echo "Desktop module configuration"
-    raptor_deskt_post_srvc
-    raptor_deskt_post_sess
+    raptor_deskt_post_serve
     echo "Desktop module configured"
 }
 
