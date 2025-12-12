@@ -428,7 +428,7 @@ function raptor_audio_post() {
 
 
 function raptor_deskt_post_sess() {
-    rm -f /mnt/usr/share/wayland-session/xfce-wayland.desktop
+    rm -f /mnt/usr/share/wayland-session/labwc.desktop
 }
 
 function raptor_deskt_post_srvc() {
