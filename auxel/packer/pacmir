@@ -16,6 +16,8 @@ sddm
 ukui
 firefox
 ghostty
+bluez
+
 firewalld
 iptables-nft
 base
