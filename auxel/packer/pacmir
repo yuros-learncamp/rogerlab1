@@ -35,6 +35,7 @@ secrets
 libsecret
 gnome-keyring
 networkmanager
+network-manager-applet
 bluez
 blueman
 bluez-utils
