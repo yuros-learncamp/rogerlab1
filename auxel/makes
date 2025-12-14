@@ -471,6 +471,14 @@ function raptor_boots_post_prep() {
     arch-chroot /mnt mkinitcpio -P
 }
 
+function raptor_boots_post_secs() {
+
+    echo "setup secure boot"
+    arch-chroot /mnt sbctl create-keys &&
+    arch-chroot /mnt sbctl enroll-keys -m -i -f &&
+    arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
+}
+
 
 ## boot loader @al muhdil karim <karim@yuros.org>, @achmad baihaqi <achmad@yuros.org>, @ibnu dzaky <dzaky@yuros.org>
 function raptor_boots_post_init() {
@@ -508,7 +516,7 @@ function raptor_boots_post_secs_mono () {
     done
 }
 
-function raptor_boots_post_secs() {
+function raptor_boots_post_secs_old() {
 
     echo "setup secure boot"
     arch-chroot /mnt sbctl create-keys &&
@@ -531,8 +539,9 @@ function raptor_boots_post() {
     sleep 2 && clear
     echo "Booting module configuration"
     raptor_boots_post_prep
-    raptor_boots_post_init
     raptor_boots_post_secs
+    raptor_boots_post_init
+    
 }
 
 function raptor_audio_post_serve() {
