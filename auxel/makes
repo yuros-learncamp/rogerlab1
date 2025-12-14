@@ -93,7 +93,7 @@ function raptor_disks_make_uefi() {
 function raptor_disks_make_root() {
     
     local label=$( lsblk -o label | grep "ROOT" | awk '{print $1}' )
-    local paths=$( lsblk -o path | grep $uefipath )
+    local paths=$( lsblk -o path | grep $rootpath )
 
     echo "create root partition"
     if [[ -z $label ]]&&[[ -z $paths ]]; then
