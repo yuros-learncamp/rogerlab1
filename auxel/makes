@@ -172,21 +172,21 @@ function raptor_disks_form() {
 
 ## MONT PARTITION
 function raptor_disks_mont_boot_dual() {
-    mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
+    mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot/efi
     mkdir -p /mnt/boot/{efi,kernel,loader}
-    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
 }
 
 function raptor_disks_mont_boot_mono() {
-    mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
+    mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot
     mkdir -p /mnt/boot/{efi,kernel,loader}
     mkdir -p /mnt/boot/efi/{boot,linux,systemd}
 }
 
 function raptor_disks_mont_boot() {
     if [[ $dualboot == true ]]&&[[ ! -z $uefipath ]];then
-        mkdir -p /mnt/boot/efi 
-        mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot/efi
+        raptor_disks_mont_boot_dual
+    else
+        raptor_disks_mont_boot_mono
     fi
 }
 
