@@ -479,7 +479,7 @@ function raptor_boots_post_init() {
     if [[ $dualboot == true ]];then
         mv -f /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak
         sleep 2
-        cp -f /mnt/boot/efi/EFI/systemd/systemd-bootx64.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
+        arch-chroot /mnt cp boot/efi/EFI/systemd/systemd-bootx64.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
         bootctl --path=/mnt/boot/efi install
     else
         rm -fr /boot/efi/loader &&
@@ -521,7 +521,9 @@ function raptor_boots_post_secs() {
         raptor_boots_post_secs_mono
     fi
 
-    arch-chroot /mnt sbctl sign --save /boot/kernel/*
+    for vml in ($(ls /mnt/boot/kernel/ | grep vmlinuz )); do
+        arch-chroot /mnt sbctl sign --save /boot/kernel/$vml
+    done
 
     arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$|sbctl sign -s "\1"|e'
 }
