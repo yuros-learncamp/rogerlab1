@@ -22,9 +22,8 @@ function raptor_disks_init_dual() {
         if [[ -d "/srv/EFI/Microsoft" ]]; then
             dualboot=true &&
             uefipath="$item_efipath" && 
-            echo "windows efi partition found at $item_efipath"
+            echo "windows efi partition : $item_efipath"
         fi
-
         sleep 1 && sudo umount -R /srv && sleep 2
 
     done
