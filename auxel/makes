@@ -81,11 +81,11 @@ function raptor_disks_make_uefi() {
 
     if [[ -z $label ]]&&[[ -z $paths ]]; then
         echo -e "n\np\n\n\n+$sizes\nt\n\n1\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
-        bootpath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
+        uefipath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
     elif [[ -n $paths ]];then
-        bootpath=$paths
+        uefipath=$paths
     elif [[ -n $label ]];then
-        bootpath=$label
+        uefipath=$label
     else
         echo "error uefi partition not found"
         exit 1
@@ -117,7 +117,6 @@ function raptor_disks_make_swap() {
     local label=$( lsblk -o label | grep "swap" | awk '{print $1}' )
     local paths=$( lsblk -o path | grep $swappath )
     local sizes=$distro_swapsize
-
 
     echo "create swap partition"
 
@@ -191,7 +190,7 @@ function raptor_disks_form_uefi() {
         return
     fi
     echo "format boot partition"
-    mkfs.vfat -F32 -S 4096 -n "BOOT" $bootpath
+    mkfs.vfat -F32 -S 4096 -n "BOOT" $uefipath
 }
 
 function raptor_disks_form_root() {
@@ -212,31 +211,34 @@ function raptor_disks_form_home() {
 }
 
 function raptor_disks_form() {
-    raptor_disks_make_uefi
-    raptor_disks_form_root
-    raptor_disks_form_swap
+    raptor_disks_make_uefi &&
+    raptor_disks_form_root &&
+    raptor_disks_form_swap &&
     raptor_disks_form_home
 }
 
 ## MONT PARTITION
-function raptor_disks_mont_boot_dual() {
-    mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
-    mkdir -p /mnt/boot/{efi,kernel,loader}
-    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
-}
+function raptor_disks_mont_dual() {
 
-function raptor_disks_mont_boot_mono() {
-    mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
-    mkdir -p /mnt/boot/{efi,kernel,loader}
-    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
-}
-
-function raptor_disks_mont_boot() {
-    if [[ $dualboot == true ]];then
-        raptor_disks_mont_boot_dual
-    else
-        raptor_disks_mont_boot_mono
+    if [[ $dualboot == false ]];then
+        return
     fi
+
+    mount -o uid=0,gid=0,dmask=007,fmask=007 $eufipath /mnt/boot/
+    mv /mnt/boot/EFI /mnt/boot/efi
+    mkdir -p /mnt/boot/efi/{linux,systemd}
+    mkdir -p /mnt/boot/{kernel,loader}
+}
+
+function raptor_disks_mont_mono() {
+    
+    if [[ $dualboot == true ]];then
+        return
+    fi
+
+    mount -o uid=0,gid=0,dmask=007,fmask=007 $eufipath /mnt/boot
+    mkdir -p /mnt/boot/{efi,kernel,loader}
+    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
 }
 
 function raptor_disks_mont_root() {
@@ -256,7 +258,8 @@ function raptor_disks_mont_home() {
 }
 
 function raptor_disks_mont() {
-    raptor_disks_mont_root &&
+    raptor_disks_mont_dual &&
+    raptor_disks_mont_mono &&
     raptor_disks_mont_boot &&
     raptor_disks_mont_swap &&
     raptor_disks_mont_home
@@ -269,6 +272,7 @@ function raptor_disks_prep() {
     raptor_disks_prev &&
     raptor_disks_form &&
     raptor_disks_mont &&
+    exit
     echo "configration done"
 }
 
