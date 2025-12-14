@@ -198,8 +198,10 @@ function raptor_disks_form_root() {
 }
 
 function raptor_disks_form_swap() {
-    echo "format swap partition"
-    mkswap $swappath
+    if [[ -n $swappath ]];then
+        echo "format swap partition"
+        mkswap $swappath
+    fi
 }
 
 function raptor_disks_form_home() {
