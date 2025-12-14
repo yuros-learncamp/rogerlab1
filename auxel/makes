@@ -258,9 +258,9 @@ function raptor_disks_mont_home() {
 }
 
 function raptor_disks_mont() {
+    raptor_disks_mont_root &&
     raptor_disks_mont_dual &&
     raptor_disks_mont_mono &&
-    raptor_disks_mont_boot &&
     raptor_disks_mont_swap &&
     raptor_disks_mont_home
     exit
