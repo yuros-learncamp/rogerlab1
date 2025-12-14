@@ -478,44 +478,46 @@ function raptor_boots_post_init() {
 
     if [[ $dualboot == true ]];then
         #bootctl --esp-path=/mnt/boot/efi --boot-path=/mnt/boot/ install
-        mv -f /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak &&
-        cp /boot/efi/EFI/systemd/systemd-bootx64.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
+        mv -f /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak &&
+        cp /mnt/boot/efi/EFI/systemd/systemd-bootx64.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
         bootctl --path=/mnt/boot/efi install
     else
         rm -fr /boot/efi/loader &&
         bootctl --path=/mnt/boot install
     fi
+
+    arch-chroot /mnt mkinitcpio -P
 }
 
 
 ## secure boot @al muhdil karim <karim@yuros.org>, @muhmmad haydar kamil <kamil@yuros.org>, @sultan fajar ramadhan <sultan@yuros.org>
 function raptor_boots_post_secs_dual () {
     echo "setup secure boot for dual boot"
-    sbctl create-keys &&
-    sbctl enroll-keys -m -i -f &&
-    sbctl sign --save /boot/efi/EFI/Boot/bootx64.efi &&
-    sbctl sign --save /boot/efi/EFI/systemd/systemd-bootx64.efi &&
-    for efi in /boot/efi/EFI/linux/*; do
-        sbctl sign --save /boot/efi/EFI/linux/$efi
+    arch-chroot /mnt sbctl create-keys &&
+    arch-chroot /mnt sbctl enroll-keys -m -i -f &&
+    arch-chroot /mnt sbctl sign --save /boot/efi/EFI/Boot/bootx64.efi &&
+    arch-chroot /mnt sbctl sign --save /boot/efi/EFI/systemd/systemd-bootx64.efi &&
+    for efi in /mnt/boot/efi/EFI/linux/*; do
+        arch-chroot /mnt sbctl sign --save /boot/efi/EFI/linux/$efi
     done
 
-    for vml in /boot/kernel/vmlinuz*; do
-        sbctl sign --save /boot/kernel/$vml
+    for vml in /mnt/boot/kernel/vmlinuz*; do
+        arch-chroot /mnt sbctl sign --save /boot/kernel/$vml
     done
-    sbctl verify | sed -E 's|^.* (/.+) is not signed$|sbctl sign -s "\1"|e'
+    arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$|sbctl sign -s "\1"|e'
 }
 
 function raptor_boots_post_secs_mono () {
     echo "setup secure boot for mono boot"
-    sbctl create-keys &&
-    sbctl enroll-keys -m -i -f &&
-    sbctl sign --save /boot/efi/boot/bootx64.efi &&
-    sbctl sign --save /boot/efi/systemd/systemd-bootx64.efi &&
-    for efi in /boot/efi/linux/*; do
-        sbctl sign --save /boot/efi/linux/$efi
+    arch-chroot /mnt sbctl create-keys &&
+    arch-chroot /mnt sbctl enroll-keys -m -i -f &&
+    arch-chroot /mnt sbctl sign --save /boot/efi/boot/bootx64.efi &&
+    arch-chroot /mnt sbctl sign --save /boot/efi/systemd/systemd-bootx64.efi &&
+    for efi in /mnt/boot/efi/linux/*; do
+        arch-chroot /mnt sbctl sign --save /boot/efi/linux/$efi
     done
-    for vml in /boot/kernel/vmlinuz*; do
-        sbctl sign --save /boot/kernel/$vml
+    for vml in /mnt/boot/kernel/vmlinuz*; do
+        arch-chroot /mnt sbctl sign --save /boot/kernel/$vml
     done
 }
 
