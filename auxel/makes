@@ -467,6 +467,8 @@ function raptor_boots_post_prep() {
 
     echo "clean initramfs"
     test -e /mnt/boot/initramfs*  && rm -f /mnt/boot/initramfs*
+
+    arch-chroot /mnt mkinitcpio -P
 }
 
 
@@ -484,14 +486,11 @@ function raptor_boots_post_init() {
         rm -fr /boot/efi/loader &&
         bootctl --path=/mnt/boot install
     fi
-
-    arch-chroot /mnt mkinitcpio -P
 }
 
 
 ## secure boot @al muhdil karim <karim@yuros.org>, @muhmmad haydar kamil <kamil@yuros.org>, @sultan fajar ramadhan <sultan@yuros.org>
 function raptor_boots_post_secs_dual () {
-
     arch-chroot /mnt sbctl sign --save /boot/efi/EFI/Boot/bootx64.efi &&
     arch-chroot /mnt sbctl sign --save /boot/efi/EFI/systemd/systemd-bootx64.efi &&
     for efi in /mnt/boot/efi/EFI/linux/*; do
