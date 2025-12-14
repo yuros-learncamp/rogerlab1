@@ -477,11 +477,9 @@ function raptor_boots_post_init() {
     echo "installation systemd boot"
 
     if [[ $dualboot == true ]];then
-        mv -f /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak
-        sleep 10
-        arch-chroot /mnt cp boot/efi/EFI/systemd/systemd-bootx64.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
-        sleep 10
         bootctl --path=/mnt/boot/efi install
+        mv -f /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak
+        cp /mnt/boot/efi/EFI/systemd/systemd-bootx64.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
     else
         rm -fr /boot/efi/loader &&
         bootctl --path=/mnt/boot install
