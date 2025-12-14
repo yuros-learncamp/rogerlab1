@@ -490,6 +490,7 @@ function raptor_boots_post_secs() {
 
     if [[ $dualboot == true ]];then
         arch-chroot /mnt sign --save /boot/efi/EFI/linux/$kernel_type
+        arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$|sbctl sign -s "\1"|e'
     else
         arch-chroot /mnt sign --save /boot/efi/linux/$kernel_type
     fi
