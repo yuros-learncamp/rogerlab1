@@ -19,8 +19,9 @@ function raptor_disks_init_dual() {
         sudo mount $item_efipath /srv && sleep 2 && 
        
         if [[ -d "/srv/EFI/Microsoft" ]]; then
-            winefipath="$item_efipath" && mkdir -p "$item_efipath/Linux" &&
+           
             echo "check windows efi partition found at $item_efipath"
+            uefipath="$item_efipath" 
             dualboot=true
         fi
 
@@ -48,14 +49,31 @@ function raptor_disks_init() {
 }
 
 ## MAKE PARTITION
-function raptor_disks_make_boot() {
+function raptor_disks_make_boot_dual() {
+    if [[ $dualboot == true ]];then
+        echo "create boot"
+        echo -e "n\np\n\n\n+1G\nt\n\n1\nw" | fdisk "$drivpath" > /dev/null 2>&1
+        sleep 2
+        bootpath=$(lsblk -o path | grep "$drivpath" | tail -n 1)
+        sleep 1
+    fi
+}
 
-   if [[ -z $( lsblk -o label | grep "BOOT" ) ]]; then
+function raptor_disks_make_boot_mono() {
+    if [[ $dualboot != true ]];then
         echo "create boot"
         echo -e "n\np\n\n\n+2G\nt\n\n1\nw" | fdisk "$drivpath" > /dev/null 2>&1
         sleep 2
         bootpath=$(lsblk -o path | grep "$drivpath" | tail -n 1)
         sleep 1
+    fi
+}
+
+function raptor_disks_make_boot() {
+
+    if [[ -z $( lsblk -o label | grep "BOOT" ) ]]; then
+        raptor_disks_make_boot_dual
+        raptor_disks_make_boot_mono
     else
         echo "prepare boot"
         bootpath=$(lsblk -o path,label | grep "BOOT" | awk '{print $1}')
@@ -106,7 +124,7 @@ function raptor_disks_make_home() {
 
 function raptor_disks_make() {
     echo "starting auto partitioning"
-    raptor_disks_make_boot &&
+    #raptor_disks_make_boot &&
     raptor_disks_make_root &&
     raptor_disks_make_swap &&
     raptor_disks_make_home
@@ -118,7 +136,6 @@ function raptor_disks_prev() {
     clear &&
     echo "Storage Information preview"
     echo "--------------------------------"
-    echo "boot path : $bootpath"
     echo "root path : $rootpath"
     echo "swap path : $swappath"
     echo "home path : $homepath"
@@ -155,24 +172,36 @@ function raptor_disks_form_home() {
 }
 
 function raptor_disks_form() {
-    raptor_disks_form_boot
+    #raptor_disks_form_boot
     raptor_disks_form_root
     raptor_disks_form_swap
     raptor_disks_form_home
 }
 
 ## MONT PARTITION
+function raptor_disks_mont_boot_dual() {
+    mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
+    mkdir -p /mnt/boot/{efi,kernel,loader}
+    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
+}
+
+function raptor_disks_mont_boot_mono() {
+    mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
+    mkdir -p /mnt/boot/{efi,kernel,loader}
+    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
+}
+
+function raptor_disks_mont_boot() {
+    if [[ $dualboot == true ]]&&[[ ! -z $uefipath ]];then
+        mkdir -p /mnt/boot/efi 
+        mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot/efi
+    fi
+}
+
 function raptor_disks_mont_root() {
     echo "mount root partition"
     mount $rootpath /mnt
     mkdir -p /mnt/{home,boot}
-}
-
-function raptor_disks_mont_boot() {
-    mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
-    mkdir -p /mnt/boot/{efi,kernel,loader}
-    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
-
 }
 
 function raptor_disks_mont_swap() {
@@ -193,7 +222,6 @@ function raptor_disks_mont() {
 }
 
 function raptor_disks_prep() {
-
     clear && echo "Partition configuration"
     raptor_disks_init &&
     raptor_disks_make &&
@@ -286,6 +314,8 @@ function raptor_distr_prep() {
     sleep 2 && clear
     echo "Distro module installation"
 }
+
+
 
 function raptor_disks_post() {
     sleep 2 && clear
@@ -390,6 +420,17 @@ function raptor_boots_post_prep() {
     test -e /mnt/boot/initramfs*  && rm -f /mnt/boot/initramfs*
 }
 
+
+function raptor_boots_post_uefi() {
+    mv -f /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak &&
+    cp /boot/efi/EFI/systemd/systemd-bootx64.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi &&
+cat << 'EOF' > /boot/efi/loader/entries/windows.conf
+title  windows boot manager
+efi    /EFI/Microsoft/Boot/bootmgfw.efi.bak
+EOF
+}
+
+
 ## boot loader @al muhdil karim <karim@yuros.org>, @achmad baihaqi <achmad@yuros.org>, @ibnu dzaky <dzaky@yuros.org>
 function raptor_boots_post_init() {
     echo "kernel parameter boot configuration"
@@ -398,11 +439,33 @@ function raptor_boots_post_init() {
 
     if [[ $dualboot == true ]];then
         #bootctl --esp-path=/mnt/boot/efi --boot-path=/mnt/boot/ install
-        bootctl --path=/mnt/boot/ install
+        raptor_boots_post_uefi
+        bootctl --path=/mnt/boot/efi install
     else
-        bootctl --path=/mnt/boot/ install
+        bootctl --path=/mnt/boot/efi install
     fi
-   
+    
+}
+
+
+
+
+
+## secure boot @al muhdil karim <karim@yuros.org>, @muhmmad haydar kamil <kamil@yuros.org>, @sultan fajar ramadhan <sultan@yuros.org>
+function raptor_boots_post_secs_dual () {
+    echo "setup secure boot for dual boot"
+}
+
+function raptor_boots_post_secs_mono () {
+    echo "setup secure boot for mono boot"
+}
+
+function raptor_boots_post_secs() {
+    if [[ $dualboot == true ]];then
+        raptor_boots_post_secs_dual
+    else
+        raptor_boots_post_secs_mono
+    fi
 }
 
 function raptor_boots_post() {
@@ -426,7 +489,7 @@ function raptor_audio_post() {
 
 
 function raptor_deskt_post_serve() {
-    arch-chroot /mnt systemctl enable sddm.service
+    arch-chroot /mnt systemctl enable sddm
     arch-chroot /mnt systemctl enable bluetooth.service
 }
 
