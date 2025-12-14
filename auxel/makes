@@ -84,7 +84,7 @@ function raptor_disks_make_boot() {
 
 function raptor_disks_make_root() {
     
-    if [[ -n $procpath ]];then
+    if [[ -n $procpath ]]&&[[ -n $( lsblk -o path | $procpath ) ]];then
         rootpath=$procpath
     elif [[ -z $( lsblk -o label | grep "ROOT" ) ]]; then
         echo "create root"
@@ -100,7 +100,7 @@ function raptor_disks_make_root() {
 
 function raptor_disks_make_swap() {
 
-    if [[ -n $swappath ]];then
+    if [[ -n $swappath ]]&&[[ -n $( lsblk -o path | $swappath ) ]];then
         swappath=$swappath
     elif [[ -z $( lsblk -o path,fstype | grep "swap" ) ]]; then
         echo "create swap"
@@ -116,7 +116,7 @@ function raptor_disks_make_swap() {
 
 function raptor_disks_make_home() {
     
-    if [[ -n $homepath ]];then
+    if [[ -n $homepath ]]&&[[ -n $( lsblk -o path | $homepath ) ]];then
         homepath=$homepath
     elif [[ -z $( lsblk -o label | grep "HOME" ) ]]; then
         echo "create home"
