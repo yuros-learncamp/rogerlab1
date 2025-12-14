@@ -10,7 +10,8 @@ function raptor_disks_init_pure() {
 
 ## dualboot validator team # @Al Muhdil Karim <karim@yuros.org> @Fawaz Rifqi Frasetia <fras@yuros.org>
 function raptor_disks_init_dual() {
-
+    
+    dualboot=false
     take_efipath=($(lsblk -o path,fstype | grep vfat | awk '{print $1}'))
 
     for item_efipath in "${take_efipath[@]}"; do
