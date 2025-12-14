@@ -65,16 +65,16 @@ function raptor_disks_init() {
     raptor_disks_init_swip
 }
 
-## MAKE PARTITION
 
+## MAKE PARTITION
 function raptor_disks_make_uefi() {
 
     if [[ $dualboot == true ]];then
         return
     fi 
 
-    label=$( lsblk -o label | grep "BOOT" | awk '{print $1}' )
-    paths=$( lsblk -o path | grep $uefipath )
+    local label=$( lsblk -o label | grep "BOOT" | awk '{print $1}' )
+    local paths=$( lsblk -o path  | grep $uefipath )
     
     echo "prepare uefi partition"
 
@@ -92,29 +92,31 @@ function raptor_disks_make_uefi() {
 
 function raptor_disks_make_root() {
     
+    echo "create root partition"
     if [[ -z $( lsblk -o label | grep "ROOT" ) ]]; then
-        echo "create root"
-        echo -e "n\np\n\n\n+27G\nw" | fdisk "$drivpath" > /dev/null 2>&1
-        sleep 2
-        rootpath=$(lsblk -o path | grep "$drivpath" | tail -n 1)
-        sleep 1
+        echo -e "n\np\n\n\n+27G\nw" | fdisk "$drivpath" > /dev/null 2>&1 && sleep 2
+        rootpath=$(lsblk -o path | grep "$drivpath" | tail -n 1) && sleep 1
     else
-        echo "prepare root"
         rootpath=$(lsblk -o path,label | grep "ROOT" | awk '{print $1}')
     fi
 }
 
 function raptor_disks_make_swap() {
-    
-    if [[ -z $( lsblk -o path,fstype | grep "swap" ) ]]; then
-        echo "create swap"
-        echo -e "n\np\n\n\n+4G\nw" | fdisk "$drivpath" > /dev/null 2>&1
-        sleep 2
-        swappath=$(lsblk -o path | grep "$drivpath" | tail -n 1)
-        sleep 1
+
+    local label=$( lsblk -o label | grep "swap" | awk '{print $1}' )
+    local paths=$( lsblk -o path | grep $uefipath )
+
+    echo "create swap"
+
+    if [[ -z $label ]]&&[[ -z $paths ]]; then
+        echo -e "n\np\n\n\n+4G\nw" | fdisk "$drivpath" > /dev/null 2>&1 && sleep 2
+        swappath=$(lsblk -o path | grep "$drivpath" | tail -n 1) && sleep 1
+    elif [[ -n $paths ]];then
+        swappath=$paths
+    elif [[ -n $label ]];then
+        swappath=$label
     else
-        echo "prepare swap"
-        swappath=$(lsblk -o path,fstype | grep swap | awk '{print $1}' )
+        echo "error swap partition not found"
     fi
 }
 
