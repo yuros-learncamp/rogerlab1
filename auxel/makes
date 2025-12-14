@@ -71,13 +71,17 @@ function raptor_disks_init() {
 
 function raptor_disks_make_uefi() {
 
+    if [[ $dualboot == true ]];then
+        return
+    fi 
+
     label=$( lsblk -o label | grep "BOOT" )
     paths=$( lsblk -o path  | grep $uefipath )
     
-    if [[ -z $label ]]&&[[ -z $paths ]]&&[[ $dualboot == false ]]; then
+    if [[ -z $label ]]&&[[ -z $paths ]]; then
         echo -e "n\np\n\n\n+2G\nt\n\n1\nw" | fdisk "$drivpath" > /dev/null 2>&1 &&  sleep 2
         bootpath=$(lsblk -o path | grep "$drivpath" | tail -n 1) && sleep 1
-    else
+    else;then
         echo "prepare uefi"
         bootpath=$(lsblk -o path,label | grep "BOOT" | awk '{print $1}')
     fi
