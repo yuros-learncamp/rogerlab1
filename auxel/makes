@@ -521,9 +521,7 @@ function raptor_boots_post_secs() {
         raptor_boots_post_secs_mono
     fi
 
-    for vml in /mnt/boot/kernel/vmlinuz*; do
-        arch-chroot /mnt sbctl sign --save /boot/kernel/$vml
-    done
+    arch-chroot /mnt sbctl sign --save /boot/kernel/*
 
     arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$|sbctl sign -s "\1"|e'
 }
