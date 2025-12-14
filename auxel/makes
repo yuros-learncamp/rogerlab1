@@ -490,10 +490,12 @@ function raptor_boots_post_secs() {
     arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
 
     if [[ $dualboot == true ]];then
-        arch-chroot /mnt sbctl sign -s -o /boot/efi/EFI/linux/$kernel_type
+        local_kernpath="sbctl sign -s -o /boot/efi/EFI/linux/$kernel_type"
     else
-        arch-chroot /mnt sbctl sign -s -o /boot/efi/linux/$kernel_type
+        local_kernpath="sbctl sign -s -o /boot/efi/linux/$kernel_type"
     fi
+
+    arch-chroot /mnt $local_kernpath 
 }
 
 ## boot loader @al muhdil karim <karim@yuros.org>, @achmad baihaqi <achmad@yuros.org>, @ibnu dzaky <dzaky@yuros.org>
