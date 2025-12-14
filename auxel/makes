@@ -504,7 +504,7 @@ function raptor_boots_post_secs_mono () {
     arch-chroot /mnt sbctl sign --save /boot/efi/systemd/systemd-bootx64.efi &&
     for efi in /mnt/boot/efi/linux/*; do
         echo $efi > /mnt/sign
-        arch-chroot /mnt sbctl sign --save /boot/efi/linux/$( cat /mnt/sign)
+        arch-chroot /mnt sbctl sign --save /boot/efi/linux/$( cat /mnt/sign )
     done
 }
 
