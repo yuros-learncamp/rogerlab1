@@ -163,7 +163,6 @@ function raptor_disks_make() {
     raptor_disks_make_root &&
     raptor_disks_make_swap &&
     raptor_disks_make_home
-    exit
 }
 
 ## PREV PARTITION
@@ -186,7 +185,11 @@ function raptor_disks_prev() {
 } 
 
 ## FORM PARTITION
-function raptor_disks_form_boot() {
+function raptor_disks_form_uefi() {
+
+    if [[ $dualboot != true ]];then
+        return
+    fi
     echo "format boot partition"
     mkfs.vfat -F32 -S 4096 -n "BOOT" $bootpath
 }
