@@ -50,6 +50,8 @@ function raptor_disks_init_swip() {
         local pathhome=$( lsblk -o path,label | grep $homepath )
         echo "home path found : $pathhome"
     fi
+
+    echo $dualboot
     
     if [[ $dualboot == false ]]&&[[ -z $pathuefi ]]&&[[ -z $pathroot ]]&&[[ -z $pathswap ]]&&[[ -z $pathhome ]];then
 
