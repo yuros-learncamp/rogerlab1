@@ -228,12 +228,14 @@ function raptor_disks_mont_root() {
 
 function raptor_disks_mont_uefi() {
 
-    mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot
+    
 
     if [[ $dualboot == true ]];then
-        mkdir -p /mnt/boot/efi/{linux,systemd}
-        mkdir -p /mnt/boot/{kernel,loader}
+        mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot/efi
+        mkdir -p /mnt/boot/efi/EFI/{linux,systemd,loader}
+        mkdir -p /mnt/boot/{kernel}
     else
+        mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot
         mkdir -p /mnt/boot/{efi,kernel,loader}
         mkdir -p /mnt/boot/efi/{boot,linux,systemd}
     fi
