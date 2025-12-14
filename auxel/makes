@@ -213,7 +213,7 @@ function raptor_disks_form_home() {
 }
 
 function raptor_disks_form() {
-    raptor_disks_make_uefi &&
+    raptor_disks_form_uefi &&
     raptor_disks_form_root &&
     raptor_disks_form_swap &&
     raptor_disks_form_home
