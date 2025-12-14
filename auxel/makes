@@ -445,23 +445,33 @@ function raptor_boots_post_prep() {
         mv /mnt/boot/intel-ucode.img /mnt/boot/kernel/ 
     fi
 
+    if [[ -e /mnt/boot/vmlinuz-linux ]]; then
+        echo "clean vmlinuz"
+        kernel_type="vmlinuz-linux"
+        mv /mnt/boot/vmlinuz-linux  /mnt/boot/kernel/ 
+    fi
+
     if [[ -e /mnt/boot/vmlinuz-linux-zen ]]; then
         echo "clean vmlinuz"
+        kernel_type="vmlinuz-linux-zen"
         mv /mnt/boot/vmlinuz-linux-zen  /mnt/boot/kernel/ 
     fi
 
     if [[ -e /mnt/boot/vmlinuz-linux-hardened ]]; then
         echo "clean vmlinuz"
+        kernel_type="vmlinuz-linux-hardened"
         mv /mnt/boot/vmlinuz-linux-hardened  /mnt/boot/kernel/ 
     fi
 
     if [[ -e /mnt/boot/vmlinuz-linux-lqx ]]; then
         echo "clean vmlinuz"
+        kernel_type="vmlinuz-linux-lqx"
         mv /mnt/boot/vmlinuz-linux-lqx  /mnt/boot/kernel/ 
     fi
 
     if [[ -e /mnt/boot/vmlinuz-linux-lts ]]; then
         echo "clean vmlinuz"
+        kernel_type="vmlinuz-linux-lts"
         mv /mnt/boot/vmlinuz-linux-lts  /mnt/boot/kernel/ 
     fi
 
@@ -477,6 +487,12 @@ function raptor_boots_post_secs() {
     arch-chroot /mnt sbctl create-keys &&
     arch-chroot /mnt sbctl enroll-keys -m -i -f &&
     arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
+
+    if [[ $dualboot == true ]];then
+        arch-chroot /mnt sign --save /boot/efi/EFI/linux/$kernel_type
+    else
+        arch-chroot /mnt sign --save /boot/efi/linux/$kernel_type
+    fi
 }
 
 
@@ -541,7 +557,6 @@ function raptor_boots_post() {
     raptor_boots_post_prep
     raptor_boots_post_secs
     raptor_boots_post_init
-    
 }
 
 function raptor_audio_post_serve() {
