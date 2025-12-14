@@ -31,13 +31,23 @@ function raptor_disks_init_dual() {
 
 function raptor_disks_init_swip() {
 
-    local pathuefi=$( lsblk -o path,label | grep $uefipath )
-    local pathroot=$( lsblk -o path,label | grep $rootpath )
-    local pathswap=$( lsblk -o path,label | grep $pathswap )
-    local homepath=$( lsblk -o path,label | grep $homepath )
+    if [[ -n $uefipath ]];then
+        local pathuefi=$( lsblk -o path,label | grep $uefipath )
+    fi
 
+    if [[ -n $rootpath ]];then
+        local pathroot=$( lsblk -o path,label | grep $rootpath )
+    fi
 
-    if [[ $dualboot == false ]]&&[[ -z $pathuefi ]]&&[[ -z $pathroot ]]&&[[ -z $pathswap ]]&&[[ -z $homepath ]];then
+    if [[ -n $swappath ]];then
+        local pathswap=$( lsblk -o path,label | grep $swappath )
+    fi
+
+    if [[ -n $homepath ]];then
+        local pathhome=$( lsblk -o path,label | grep $homepath )
+    fi
+    
+    if [[ $dualboot == false ]]&&[[ -z $pathuefi ]]&&[[ -z $pathroot ]]&&[[ -z $pathswap ]]&&[[ -z $pathhome ]] ]];then
 
         read -p "Do yout want swipe partition table : [y/N] " swipe_partition_table
 
