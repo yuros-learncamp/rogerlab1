@@ -64,7 +64,7 @@ function raptor_disks_make_boot_mono() {
         echo "create boot"
         echo -e "n\np\n\n\n+2G\nt\n\n1\nw" | fdisk "$drivpath" > /dev/null 2>&1
         sleep 2
-        bootpath=$(lsblk -o path | grep "$drivpath" | tail -n 1)
+        uefipath=$(lsblk -o path | grep "$drivpath" | tail -n 1)
         sleep 1
     fi
 }
@@ -72,14 +72,14 @@ function raptor_disks_make_boot_mono() {
 function raptor_disks_make_boot() {
 
     echo "create boot partition"
-    if [[ -n $uefipath ]];then
+    if [[ -n $uefipath ]]&&[[ ! -z $( lsblk -o path | grep $uefipath ) ]];then
         uefipath=$uefipath
     elif [[ -z $( lsblk -o label | grep "BOOT" ) ]]; then
         raptor_disks_make_boot_dual
         raptor_disks_make_boot_mono
     else
         
-        bootpath=$(lsblk -o path,label | grep "BOOT" | awk '{print $1}')
+        uefipath=$(lsblk -o path,label | grep "BOOT" | awk '{print $1}')
     fi
 }
 
