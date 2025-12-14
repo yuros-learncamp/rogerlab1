@@ -138,10 +138,14 @@ function raptor_disks_make_home() {
 
     local label=$( lsblk -o label | grep "HOME" | awk '{print $1}' )
     local paths=$( lsblk -o path | grep $homepath )
+    local sizes=$distro_homesize
 
     echo "create home partition"
-    if [[ -z $label ]]&&[[ -z $paths ]]; then
+    if [[ -z $label ]]&&[[ -z $paths ]]&&[[ $sizes == "all" ]]; then
         echo -e "n\np\n\n\n\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
+        homepath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
+    if [[ -z $label ]]&&[[ -z $paths ]]&&[[ $sizes != "all" ]]; then
+        echo -e "n\np\n\n\n+$sizes\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         homepath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
     elif [[ -n $paths ]];then
         homepath=$paths
