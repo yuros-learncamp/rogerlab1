@@ -455,16 +455,6 @@ function raptor_boots_post_prep() {
 }
 
 
-function raptor_boots_post_uefi() {
-    mv -f /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak &&
-    cp /boot/efi/EFI/systemd/systemd-bootx64.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi &&
-cat << 'EOF' > /boot/efi/loader/entries/windows.conf
-title  windows boot manager
-efi    /EFI/Microsoft/Boot/bootmgfw.efi.bak
-EOF
-}
-
-
 ## boot loader @al muhdil karim <karim@yuros.org>, @achmad baihaqi <achmad@yuros.org>, @ibnu dzaky <dzaky@yuros.org>
 function raptor_boots_post_init() {
     echo "kernel parameter boot configuration"
@@ -473,12 +463,13 @@ function raptor_boots_post_init() {
 
     if [[ $dualboot == true ]];then
         #bootctl --esp-path=/mnt/boot/efi --boot-path=/mnt/boot/ install
-        raptor_boots_post_uefi
+        mv -f /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.dualboot &&
+        cp /boot/efi/EFI/systemd/systemd-bootx64.efi /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
         bootctl --path=/mnt/boot/efi install
     else
+        rm -fr /boot/efi/loader &&
         bootctl --path=/mnt/boot install
     fi
-    
 }
 
 
