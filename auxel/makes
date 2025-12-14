@@ -492,6 +492,7 @@ function raptor_boots_post_init() {
 function raptor_boots_post_secs_dual () {
     echo "setup secure boot for dual boot"
     sbctl create-keys &&
+    sbctl enroll-keys -m -i &&
     sbctl sign --save /boot/efi/EFI/Boot/bootx64.efi &&
     sbctl sign --save /boot/efi/EFI/systemd/systemd-bootx64.efi &&
     for efi in /boot/efi/EFI/linux/*; do
@@ -501,17 +502,18 @@ function raptor_boots_post_secs_dual () {
     for vml in /boot/kernel/vmlinuz*; do
         sbctl sign --save /boot/kernel/$vml
     done
-    sbctl enroll-keys -m -i &&
+    
     sbctl verify | sed -E 's|^.* (/.+) is not signed$|sbctl sign -s "\1"|e'
 }
 
 function raptor_boots_post_secs_mono () {
     echo "setup secure boot for mono boot"
     sbctl create-keys &&
+    sbctl enroll-keys -m -i &&
     sbctl sign --save /boot/efi/boot/bootx64.efi &&
     sbctl sign --save /boot/efi/systemd/systemd-bootx64.efi &&
     for efi in /boot/efi/linux/*; do
-        sbctl sign --save /boot/efi/EFI/linux/$efi
+        sbctl sign --save /boot/efi/linux/$efi
     done
     for vml in /boot/kernel/vmlinuz*; do
         sbctl sign --save /boot/kernel/$vml
