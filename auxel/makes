@@ -186,6 +186,7 @@ function raptor_disks_prev() {
 ## FORM PARTITION
 function raptor_disks_form_uefi() {
 
+    echo " duaboot status : "$dualboot
     if [[ $dualboot == false ]];then
         echo "format boot partition"
         mkfs.vfat -F32 -S 4096 -n "BOOT" $uefipath
