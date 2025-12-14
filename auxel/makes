@@ -75,11 +75,12 @@ function raptor_disks_make_uefi() {
 
     local label=$( lsblk -o label | grep "BOOT" | awk '{print $1}' )
     local paths=$( lsblk -o path  | grep $uefipath )
-    
+    local sizes=$distro_uefisize
+
     echo "prepare uefi partition"
 
     if [[ -z $label ]]&&[[ -z $paths ]]; then
-        echo -e "n\np\n\n\n+2G\nt\n\n1\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
+        echo -e "n\np\n\n\n+$sizes\nt\n\n1\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         bootpath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
     elif [[ -n $paths ]];then
         bootpath=$paths
@@ -95,10 +96,11 @@ function raptor_disks_make_root() {
     
     local label=$( lsblk -o label | grep "ROOT" | awk '{print $1}' )
     local paths=$( lsblk -o path | grep $rootpath )
+    local sizes=$distro_procsize
 
     echo "create root partition"
     if [[ -z $label ]]&&[[ -z $paths ]]; then
-        echo -e "n\np\n\n\n+27G\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
+        echo -e "n\np\n\n\n+$sizes\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         rootpath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
     elif [[ -n $paths ]];then
         rootpath=$paths
@@ -114,11 +116,13 @@ function raptor_disks_make_swap() {
 
     local label=$( lsblk -o label | grep "swap" | awk '{print $1}' )
     local paths=$( lsblk -o path | grep $swappath )
+    local sizes=$distro_swapsize
+
 
     echo "create swap partition"
 
     if [[ -z $label ]]&&[[ -z $paths ]]; then
-        echo -e "n\np\n\n\n+4G\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
+        echo -e "n\np\n\n\n+$sizes\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         swappath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
     elif [[ -n $paths ]];then
         swappath=$paths
