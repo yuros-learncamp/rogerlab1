@@ -12,19 +12,19 @@ function raptor_disks_init_pure() {
 function raptor_disks_init_dual() {
     
     dualboot=false
-    take_efipath=($(lsblk -o path,fstype | grep vfat | awk '{print $1}'))
+    efipaths=($(lsblk -o path,fstype | grep vfat | awk '{print $1}'))
 
-    for item_efipath in "${take_efipath[@]}"; do
+    for item_efipath in "${efipaths[@]}"; do
 
         echo "check efi partition at $item_efipath" 
         sudo mount $item_efipath /srv && sleep 2 && 
-       
-        if [[ -d "/srv/EFI/Microsoft" ]]; then
-            winefipath="$item_efipath" && mkdir -p "$item_efipath/Linux" &&
-            echo "check windows efi partition found at $item_efipath"
-            dualboot=true
-        fi
 
+        if [[ -d "/srv/EFI/Microsoft" ]]; then
+            dualboot=true &&
+            uefipath="$item_efipath" && 
+            echo "windows efi partition found at $item_efipath"
+        fi
+        
         sleep 1 && sudo umount -R /srv && sleep 2
 
     done
@@ -34,26 +34,21 @@ function raptor_disks_init_swip() {
 
     if [[ -n $uefipath ]];then
         local pathuefi=$( lsblk -o path,label | grep $uefipath )
-        echo "uefi path found : $pathuefi"
     fi
 
     if [[ -n $rootpath ]];then
         local pathroot=$( lsblk -o path,label | grep $rootpath )
-        echo "root path found : $pathroot"
     fi
 
     if [[ -n $swappath ]];then
         local pathswap=$( lsblk -o path,label | grep $swappath )
-        echo "swap path found : $pathswap"
     fi
 
     if [[ -n $homepath ]];then
         local pathhome=$( lsblk -o path,label | grep $homepath )
-        echo "home path found : $pathhome"
+
     fi
 
-    echo $dualboot
-    
     if [[ $dualboot == false ]]&&[[ -z $pathuefi ]]&&[[ -z $pathroot ]]&&[[ -z $pathswap ]]&&[[ -z $pathhome ]];then
 
         read -p "Do yout want swipe partition table : [y/N] " swipe_partition_table
