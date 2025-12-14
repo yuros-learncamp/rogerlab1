@@ -185,7 +185,7 @@ function raptor_disks_mont_boot_mono() {
 function raptor_disks_mont_boot() {
     if [[ $dualboot == true ]]&&[[ ! -z $uefipath ]];then
         raptor_disks_mont_boot_dual
-    else
+    elif [[ $dualboot != true ]]&&[[ ! -z $uefipath ]];then
         raptor_disks_mont_boot_mono
     fi
 }
