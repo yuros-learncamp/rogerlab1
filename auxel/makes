@@ -218,37 +218,23 @@ function raptor_disks_form() {
 }
 
 ## MONT PARTITION
-function raptor_disks_mont_dual() {
-
-    if [[ $dualboot == false ]];then
-        return
-    fi
-
-    mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot
-    mkdir -p /mnt/boot/efi/{linux,systemd}
-    mkdir -p /mnt/boot/{kernel,loader}
-}
-
-function raptor_disks_mont_mono() {
-    
-    if [[ $dualboot == true ]];then
-        return
-    fi
-
-    mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot
-    mkdir -p /mnt/boot/{efi,kernel,loader}
-    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
-}
-
 function raptor_disks_mont_root() {
     echo "mount root partition"
     mount $rootpath /mnt
     mkdir -p /mnt/{home,boot}
 }
 
-function raptor_disks_mont_swap() {
-    echo "mount swap partition"
-    swapon $swappath
+function raptor_disks_mont_uefi() {
+
+    mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot
+
+    if [[ $dualboot == true ]];then
+        mkdir -p /mnt/boot/efi/{linux,systemd}
+        mkdir -p /mnt/boot/{kernel,loader}
+    else
+        mkdir -p /mnt/boot/{efi,kernel,loader}
+        mkdir -p /mnt/boot/efi/{boot,linux,systemd}
+    fi
 }
 
 function raptor_disks_mont_home() {
@@ -256,12 +242,16 @@ function raptor_disks_mont_home() {
     mount $homepath /mnt/home
 }
 
+function raptor_disks_mont_swap() {
+    echo "mount swap partition"
+    swapon $swappath
+}
+
 function raptor_disks_mont() {
     raptor_disks_mont_root &&
-    raptor_disks_mont_dual &&
-    raptor_disks_mont_mono &&
-    raptor_disks_mont_swap &&
-    raptor_disks_mont_home
+    raptor_disks_mont_uefi &&
+    raptor_disks_mont_home &&
+    raptor_disks_mont_swap
     exit
 }
 
