@@ -492,7 +492,7 @@ function raptor_boots_post_init() {
 function raptor_boots_post_secs_dual () {
     echo "setup secure boot for dual boot"
     sbctl create-keys &&
-    sbctl enroll-keys -m -i &&
+    sbctl enroll-keys -m -i -f &&
     sbctl sign --save /boot/efi/EFI/Boot/bootx64.efi &&
     sbctl sign --save /boot/efi/EFI/systemd/systemd-bootx64.efi &&
     for efi in /boot/efi/EFI/linux/*; do
@@ -508,7 +508,7 @@ function raptor_boots_post_secs_dual () {
 function raptor_boots_post_secs_mono () {
     echo "setup secure boot for mono boot"
     sbctl create-keys &&
-    sbctl enroll-keys -m -i &&
+    sbctl enroll-keys -m -i -f &&
     sbctl sign --save /boot/efi/boot/bootx64.efi &&
     sbctl sign --save /boot/efi/systemd/systemd-bootx64.efi &&
     for efi in /boot/efi/linux/*; do
