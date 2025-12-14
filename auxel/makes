@@ -520,7 +520,7 @@ function raptor_boots_post_secs() {
         raptor_boots_post_secs_mono
     fi
 
-    for vml in ($(ls /mnt/boot/kernel/ | grep vmlinuz )); do
+    for vml in $($(ls /mnt/boot/kernel/ | grep vmlinuz )); do
         arch-chroot /mnt sbctl sign --save /boot/kernel/$vml
     done
 
