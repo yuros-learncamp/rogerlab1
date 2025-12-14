@@ -491,7 +491,6 @@ function raptor_boots_post_secs() {
 
     if [[ $dualboot == true ]];then
         arch-chroot /mnt sbctl sign --save /boot/efi/EFI/linux/$kernel_type
-        arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$| arch-chroot /mnt sbctl sign -s "\1"|e'
     else
         arch-chroot /mnt sbctl sign --save /boot/efi/linux/$kernel_type
     fi
@@ -507,6 +506,7 @@ function raptor_boots_post_boot() {
         bootctl --path=/mnt/boot/efi install
         mv -f /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak
         cp /mnt/boot/efi/EFI/systemd/systemd-bootx64.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
+        arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$| arch-chroot /mnt sbctl sign -s "\1"|e'
     else
         rm -fr /boot/efi/loader &&
         bootctl --path=/mnt/boot install
