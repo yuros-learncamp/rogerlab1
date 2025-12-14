@@ -47,7 +47,7 @@ function raptor_disks_init_swip() {
         local pathhome=$( lsblk -o path,label | grep $homepath )
     fi
     
-    if [[ $dualboot == false ]]&&[[ -z $pathuefi ]]&&[[ -z $pathroot ]]&&[[ -z $pathswap ]]&&[[ -z $pathhome ]] ]];then
+    if [[ $dualboot == false ]]&&[[ -z $pathuefi ]]&&[[ -z $pathroot ]]&&[[ -z $pathswap ]]&&[[ -z $pathhome ]];then
 
         read -p "Do yout want swipe partition table : [y/N] " swipe_partition_table
 
