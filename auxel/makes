@@ -144,7 +144,7 @@ function raptor_disks_make_home() {
     if [[ -z $label ]]&&[[ -z $paths ]]&&[[ $sizes == "all" ]]; then
         echo -e "n\np\n\n\n\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         homepath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
-    if [[ -z $label ]]&&[[ -z $paths ]]&&[[ $sizes != "all" ]]; then
+    elif [[ -z $label ]]&&[[ -z $paths ]]&&[[ $sizes != "all" ]]; then
         echo -e "n\np\n\n\n+$sizes\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         homepath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
     elif [[ -n $paths ]];then
