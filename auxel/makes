@@ -225,7 +225,6 @@ function raptor_disks_mont_dual() {
     fi
 
     mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot
-    mv /mnt/boot/EFI /mnt/boot/efi
     mkdir -p /mnt/boot/efi/{linux,systemd}
     mkdir -p /mnt/boot/{kernel,loader}
 }
