@@ -32,23 +32,23 @@ function raptor_disks_init_dual() {
 function raptor_disks_init_swip() {
 
     if [[ -n $uefipath ]];then
-        echo "eufi path found"
         local pathuefi=$( lsblk -o path,label | grep $uefipath )
+        echo "uefi path found : $pathuefi"
     fi
 
     if [[ -n $rootpath ]];then
-        echo "root path found"
         local pathroot=$( lsblk -o path,label | grep $rootpath )
+        echo "root path found : $pathroot"
     fi
 
     if [[ -n $swappath ]];then
-        echo "swap path found"
         local pathswap=$( lsblk -o path,label | grep $swappath )
+        echo "swap path found : $pathswap"
     fi
 
     if [[ -n $homepath ]];then
-        echo "home path found"
         local pathhome=$( lsblk -o path,label | grep $homepath )
+        echo "home path found : $pathhome"
     fi
     
     if [[ $dualboot == false ]]&&[[ -z $pathuefi ]]&&[[ -z $pathroot ]]&&[[ -z $pathswap ]]&&[[ -z $pathhome ]];then
