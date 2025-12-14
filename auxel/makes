@@ -209,6 +209,7 @@ function raptor_disks_prev() {
     clear &&
     echo "Storage Information preview"
     echo "--------------------------------"
+    echo "uefi path : $uefipath"
     echo "root path : $rootpath"
     echo "swap path : $swappath"
     echo "home path : $homepath"
