@@ -24,7 +24,7 @@ function raptor_disks_init_dual() {
             uefipath="$item_efipath" && 
             echo "windows efi partition found at $item_efipath"
         fi
-        
+
         sleep 1 && sudo umount -R /srv && sleep 2
 
     done
@@ -55,6 +55,8 @@ function raptor_disks_init_swip() {
 
         if [[ $swipe_partition_table == "Y" ]]||[[ $swipe_partition_table == "y" ]];then
             sudo parted -s $drivpath mklabel gpt
+        else
+            echo "continue installation"
         fi
     fi
 }
