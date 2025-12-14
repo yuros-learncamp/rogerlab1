@@ -263,6 +263,7 @@ function raptor_disks_mont() {
     raptor_disks_mont_boot &&
     raptor_disks_mont_swap &&
     raptor_disks_mont_home
+    exit
 }
 
 function raptor_disks_prep() {
@@ -272,8 +273,7 @@ function raptor_disks_prep() {
     raptor_disks_prev &&
     raptor_disks_form &&
     raptor_disks_mont &&
-    exit
-    echo "configration done"
+     echo "configration done"
 }
 
 function raptor_cores_prep_mulibs() {
