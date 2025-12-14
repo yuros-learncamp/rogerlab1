@@ -87,6 +87,7 @@ function raptor_disks_make_uefi() {
         bootpath=$label
     else
         echo "error uefi partition not found"
+        exit 1
     fi
 }
 
@@ -105,6 +106,7 @@ function raptor_disks_make_root() {
         rootpath=$label
     else
         echo "error root partition not found"
+        exit 1
     fi
 }
 
@@ -124,6 +126,7 @@ function raptor_disks_make_swap() {
         swappath=$label
     else
         echo "error swap partition not found"
+        exit 1
     fi
 }
 
@@ -142,6 +145,7 @@ function raptor_disks_make_home() {
         homepath=$label
     else
         echo "error home partition not found"
+        exit 1
     fi
 }
 
