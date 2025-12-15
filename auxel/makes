@@ -218,6 +218,7 @@ function raptor_disks_mont_uefi() {
     if [[ -n $uefipath ]];then
         mount $uefipath /srv
         sudo cp -r /srv/EFI/Microsoft /boot/efi/
+        exit 0
         umount -R /srv
     fi
 }
