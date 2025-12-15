@@ -151,10 +151,6 @@ function raptor_firms_prep_nvidi_vali() {
         gpuDriver="unidentified"
         ;;
     esac
-
-    echo "Nvidia firm: $gpuDriver"
-    echo "Nvidia gens: $gpuGen"
-    exit
 }
 
 function raptor_firms_prep_nvidi_open() {
@@ -223,6 +219,10 @@ function raptor_firms_prep() {
     raptor_firms_prep_intel &&
     raptor_firms_prep_radeo &&
     raptor_firms_prep_nvidi
+
+    echo "Nvidia firm: $gpuDriver"
+    echo "Nvidia gens: $gpuGen"
+    exit
 }
 
 ## PREP PARTITION
