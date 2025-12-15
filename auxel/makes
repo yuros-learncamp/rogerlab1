@@ -190,7 +190,7 @@ function raptor_firms_prep_nvidi() {
     raptor_firms_prep_nvidi_vali &&
     raptor_firms_prep_nvidi_open &&
     raptor_firms_prep_nvidi_dkms
-    gpudriver="nvidia"
+    nvidia_driver=true
 }
 
 function raptor_firms_prep_radeo() {
@@ -223,6 +223,7 @@ function raptor_firms_prep() {
 
     echo "Nvidia firm: $nvidia_gpu_firm"
     echo "Nvidia gens: $nvidia_gpu_gens"
+    echo "Nvidia load: $nvidia_driver"
     exit
 }
 
@@ -568,16 +569,16 @@ function raptor_cores_prep() {
 
 function raptor_firms_post_grap() {
 
-    if [[ $gpudriver != "nvidia" ]];then
+    if [[ $nvidia_driver != true ]];then
         rm -f "/mnt/etc/modprobe.d/nvidia.conf"
     fi
 
-    if [[ $gpudriver == "nvidia" ]];then
+    if [[ $nvidia_driver == true ]];then
         rm -f "/mnt/etc/mkinitcpio.d/radeon.conf"
         rm -f "/mnt/etc/mkinitcpio.d/default.conf"
         mv -f "/mnt/etc/mkinitcpio.d/nvidia.conf" "/mnt/etc/mkinitcpio.d/default.conf"
     
-    elif [[ $gpudriver == "radeon" ]];then
+    elif [[ $radeon_driver == true ]];then
         rm -f "/mnt/etc/mkinitcpio.d/nvidia.conf"
         rm -f "/mnt/etc/mkinitcpio.d/default.conf"
         mv -f "/mnt/etc/mkinitcpio.d/radeon.conf" "/mnt/etc/mkinitcpio.d/default.conf"
