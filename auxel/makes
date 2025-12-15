@@ -153,7 +153,7 @@ function raptor_disks_make_uefi() {
 
 function raptor_disks_make() {
     clear &&
-    echo "Storage Information preview"
+    echo "STORAGE INFORMATION"
     echo "--------------------------------"
     raptor_disks_make_uefi &&
     raptor_disks_make_boot &&
@@ -166,7 +166,6 @@ function raptor_disks_make() {
         echo "Proccess cancelation by user"
         exit 1
     fi
-    
 }
 
 ## FORM PARTITION
@@ -195,6 +194,8 @@ function raptor_disks_form_home() {
 }
 
 function raptor_disks_form() {
+    clear &&
+    echo "FORMATING STORAGE"
     raptor_disks_form_boot &&
     raptor_disks_form_proc &&
     raptor_disks_form_swap &&
@@ -233,6 +234,9 @@ function raptor_disks_mont_swap() {
 }
 
 function raptor_disks_mont() {
+    clear &&
+    echo "MOUNTING FILE SYSTEM"
+    echo "--------------------------------"
     raptor_disks_mont_proc &&
     raptor_disks_mont_boot &&
     raptor_disks_mont_home &&
