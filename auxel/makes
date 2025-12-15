@@ -51,7 +51,6 @@ function raptor_disks_make_boot() {
     local sizes=$distro_bootsize
 
     echo "boot path: $bootpath"
-    exit 0
     echo "prepare boot partition"
 
     if [[ -z $label ]]&&[[ -z $paths ]]; then
