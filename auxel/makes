@@ -67,33 +67,33 @@ function raptor_firms_prep_firms() {
      
 }
 
-function raptor_firms_prep_graph_nvid() {
-    echo "nvidia";
-}
+function raptor_firms_prep_nvidi() {
 
-function raptor_firms_prep_graph_rads() {
-    echo "nvidia";
-}
-
-function raptor_firms_prep_graph_inte() {
-    echo "intel";
-}
-
-function raptor_firms_prep_graph() {
-
-    if [[ ! -z $( lspci | grep 'VGA' | grep 'Intel Corporation') ]];then
-        echo "vulkan-intel" >> "$raptor_packer"
+   if [[ -z $(lspci | grep '3d\|NVIDIA') ]];then
+        return
     fi
 
-    if [[ ! -z $(lspci | grep '3d\|NVIDIA') ]];then
-        echo "nvidia-utils" >> "$raptor_packer"
-        pacstrap /mnt nvidia-utils
+    echo "nvidia-utils" >> "$raptor_packer"
+}
+
+function raptor_firms_prep_radeo() {
+
+    if [[ -z $(lspci | grep '3d\|RADEON') ]];then
+       
     fi
 
-    if [[ ! -z $(lspci | grep '3d\|RADEON') ]];then
-        echo "nvidia-radeon" >> "$raptor_packer"
-    fi
+    echo "vulkan-radeon" >> "$raptor_packer"
 }
+
+function raptor_firms_prep_intel() {
+
+    if [[ -z $( lspci | grep 'VGA' | grep 'Intel Corporation') ]];then
+        return
+    fi
+
+    echo "vulkan-intel" >> "$raptor_packer"
+}
+
 
 function raptor_firms_prep() {
     raptor_firms_prep_bluez
@@ -101,6 +101,9 @@ function raptor_firms_prep() {
     raptor_firms_prep_iwctl
     raptor_firms_prep_firms
     raptor_firms_prep_graph
+    raptor_firms_prep_intel
+    raptor_firms_prep_radeo
+    raptor_firms_prep_nvidi
 }
 
 ## PREP PARTITION
@@ -322,7 +325,7 @@ function raptor_disks_mont_boot() {
 function raptor_disks_mont_uefi() {
     if [[ -n $uefipath ]];then
         mount $uefipath /srv && sleep 1
-        sudo cp -r /srv/EFI/Microsoft /mnt/boot/ && sleep 1
+        sudo cp -r /srv/EFI/Microsoft /mnt/boot/efi/ && sleep 1
         umount -R /srv && sleep 1
     fi
 }
