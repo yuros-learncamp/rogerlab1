@@ -235,9 +235,9 @@ function raptor_disks_mont_swap() {
 function raptor_disks_mont() {
     raptor_disks_mont_proc &&
     raptor_disks_mont_boot &&
-    raptor_disks_mont_uefi &&
     raptor_disks_mont_home &&
-    raptor_disks_mont_swap
+    raptor_disks_mont_swap &&
+    raptor_disks_mont_uefi 
 }
 
 function raptor_disks_prep() {
