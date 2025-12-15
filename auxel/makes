@@ -71,13 +71,14 @@ function raptor_disks_make_root() {
     local paths=$( lsblk -o path | grep $rootpath )
     local sizes=$distro_procsize
 
+    echo $rootpath
+    exit 0
+
     echo "create root partition"
     if [[ -z $label ]]&&[[ -z $paths ]]; then
         echo -e "n\np\n\n\n+$sizes\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         rootpath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
     elif [[ -n $paths ]];then
-        echo $rootpath
-        exit 0
         rootpath=$paths
     elif [[ -n $label ]];then
         rootpath=$label
