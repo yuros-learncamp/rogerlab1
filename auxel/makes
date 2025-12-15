@@ -481,15 +481,14 @@ function raptor_disks_mont_proc() {
 function raptor_disks_mont_boot() {
     mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
     mkdir -p /mnt/boot/{efi,kernel,loader}
-    mkdir -p /mnt/boot/efi/{linux,systemd}
+    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
 }
 
 function raptor_disks_mont_uefi() {
     if [[ -n $uefipath ]];then
         mount $uefipath /srv && sleep 1
-        mkdir -p /mnt/boot/guest &&
-        mount $uefipath /mnt/boot/guest &&
-        mount --bind /mnt/boot/guest/EFI/Microsoft /mnt/boot/efi/ && sleep 1
+        mkdir -p /mnt/boot/efi/windows &&
+        sudo cp -fr /srv/EFI/Microsoft/Boot/* /mnt/boot/efi/windows && sleep 1
         umount -R /srv && sleep 1
     fi
 }
