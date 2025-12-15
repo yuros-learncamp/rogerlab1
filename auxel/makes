@@ -57,6 +57,7 @@ function raptor_disks_make_boot() {
         echo -e "n\np\n\n\n+$sizes\nt\n\n1\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         bootpath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
         partprobe "$loadpath"
+        hdparm "$loadpath"
     elif [[ -n $paths ]];then
         bootpath=$paths
     elif [[ -n $label ]];then
@@ -83,6 +84,7 @@ function raptor_disks_make_proc() {
         echo -e "n\np\n\n\n+$sizes\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         rootpath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
         partprobe "$loadpath"
+        hdparm "$loadpath"
     elif [[ -n $paths ]];then
         rootpath=$paths
     elif [[ -n $label ]];then
@@ -107,6 +109,7 @@ function raptor_disks_make_swap() {
         echo -e "n\np\n\n\n+$sizes\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         swappath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
         partprobe "$loadpath"
+        hdparm "$loadpath"
     elif [[ -n $paths ]];then
         swappath=$paths
     elif [[ -n $label ]];then
@@ -128,10 +131,12 @@ function raptor_disks_make_home() {
         echo -e "n\np\n\n\n\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         homepath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
         partprobe "$loadpath"
+        hdparm "$loadpath"
     elif [[ -z $label ]]&&[[ -z $paths ]]&&[[ $sizes != "all" ]]; then
         echo -e "n\np\n\n\n+$sizes\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
         homepath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
         partprobe "$loadpath"
+        hdparm "$loadpath"
     elif [[ -n $paths ]];then
         homepath=$paths
     elif [[ -n $label ]];then
