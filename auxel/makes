@@ -67,7 +67,6 @@ function raptor_firms_prep_firms() {
      
 }
 
-
 function raptor_firms_prep_nvidi_vali() {
 
     # Default values
@@ -154,59 +153,40 @@ function raptor_firms_prep_nvidi_vali() {
     esac
 }
 
-function raptor_firms_prep_nvidi_black() {
-    echo "open"
-}
+function raptor_firms_prep_nvidi_open() {
 
-function raptor_firms_prep_nvidi_hoppe() {
-    echo "open"
-}
-
-function raptor_firms_prep_nvidi_lovel() {
-    echo "open"
-}
-
-function raptor_firms_prep_nvidi_amper() {
-    echo "open"
-}
-
-function raptor_firms_prep_nvidi_turin() {
-    echo "open"
-}
-
-function raptor_firms_prep_nvidi_volta() {
-
-    if [[ $gpuGen != "Volta" ]];then
+    if [[ $gpuDriver != "manual" ]];then
         return
     fi
 
-    echo "nvidia-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd lib32-nvidia-utils lib32-opencl-nvidia"
+    echo "nvidia-open-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd" >> "$raptor_packer"
+
+    if [[ -n $distro_libs32 ]]&&[[ $distro_libs32 == true ]];then
+        echo "lib32-nvidia-utils lib32-opencl-nvidia" >> "$raptor_packer"
+    fi
 }
 
-function raptor_firms_prep_nvidi_pasca() {
-    echo "nvidia-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd lib32-nvidia-utils lib32-opencl-nvidia"
-}
+function raptor_firms_prep_nvidi_dkms() {
 
-function raptor_firms_prep_nvidi_maxwe() {
-    echo "nvidia-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd lib32-nvidia-utils lib32-opencl-nvidia"
-}
+    if [[ $gpuDriver != "nvidia-dkms" ]];then
+        return
+    fi
 
+    echo "nvidia-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd" >> "$raptor_packer"
+
+    if [[ -n $distro_libs32 ]]&&[[ $distro_libs32 == true ]];then
+        echo "lib32-nvidia-utils lib32-opencl-nvidia" >> "$raptor_packer"
+    fi
+}
 
 function raptor_firms_prep_nvidi() {
 
     if [[ -z $(lspci | grep '3d\|NVIDIA') ]];then
         return
     fi
-    raptor_firms_prep_nvidi_black
-    raptor_firms_prep_nvidi_hoppe
-    raptor_firms_prep_nvidi_lovel
-    raptor_firms_prep_nvidi_amper
-    raptor_firms_prep_nvidi_turin
-    raptor_firms_prep_nvidi_volta
-    raptor_firms_prep_nvidi_pasca
-    raptor_firms_prep_nvidi_maxwe
-
-    echo "nvidia-utils" >> "$raptor_packer"
+    raptor_firms_prep_nvidi_vali
+    raptor_firms_prep_nvidi_open
+    raptor_firms_prep_nvidi_dkms
 }
 
 function raptor_firms_prep_radeo() {
