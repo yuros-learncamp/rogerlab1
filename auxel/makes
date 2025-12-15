@@ -52,15 +52,15 @@ function raptor_firms_prep_firms() {
     fi
 
     if [[ ! -z $( lspci | grep 'NVIDIA\|Nvidia') ]];then
-        echo "linux-firmware-nvidia " >> "$raptor_packer"
+        echo "linux-firmware-nvidia" >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'ATI\|Radeon') ]];then
-        echo "linux-firmware-radeon " >> "$raptor_packer"
+        echo "linux-firmware-radeon" >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'Realtek') ]];then
-        echo "linux-firmware-realtek " >> "$raptor_packer"
+        echo "linux-firmware-realtek" >> "$raptor_packer"
     fi
 }
 
