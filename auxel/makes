@@ -161,9 +161,6 @@ function raptor_firms_prep_nvidi_open() {
         return
     fi
 
-    echo "Nvidia firm: $gpuDriver"
-    echo "Nvidia gens: $gpuGen"
-
     echo "nvidia-open-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd" >> "$raptor_packer"
 
     if [[ -n $distro_libs32 ]]&&[[ $distro_libs32 == true ]];then
@@ -224,7 +221,9 @@ function raptor_firms_prep() {
     raptor_firms_prep_radeo &&
     raptor_firms_prep_nvidi
 
-     exit
+    echo "Nvidia firm: $gpuDriver"
+    echo "Nvidia gens: $gpuGen"
+    exit
 }
 
 ## PREP PARTITION
