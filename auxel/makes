@@ -65,22 +65,6 @@ function raptor_disks_make_boot() {
     fi
 }
 
-## dualboot validator team # @Al Muhdil Karim <karim@yuros.org> @Fawaz Rifqi Frasetia <fras@yuros.org>
-function raptor_disks_make_uefi() {
-
-    efipaths=($(lsblk -o path,fstype | grep vfat | awk '{print $1}'))
-
-    for path in "${efipaths[@]}"; do
-        sudo mount $path /srv && sleep 2 && 
-
-        if [[ -d "/srv/EFI/Microsoft" ]]; then
-            uefipath="$path" && 
-            echo "found efi : $path"
-        fi
-        sleep 1 && sudo umount -R /srv && sleep 2
-    done
-}
-
 function raptor_disks_make_root() {
     
     local label=$( lsblk -o path,label | grep "ROOT" | awk '{print $1}' )
@@ -145,13 +129,29 @@ function raptor_disks_make_home() {
     fi
 }
 
+## dualboot validator team # @Al Muhdil Karim <karim@yuros.org> @Fawaz Rifqi Frasetia <fras@yuros.org>
+function raptor_disks_make_uefi() {
+
+    efipaths=($(lsblk -o path,fstype | grep vfat | awk '{print $1}'))
+
+    for path in "${efipaths[@]}"; do
+        sudo mount $path /srv && sleep 2 && 
+
+        if [[ -d "/srv/EFI/Microsoft" ]]; then
+            uefipath="$path" && 
+            echo "found efi : $path"
+        fi
+        sleep 1 && sudo umount -R /srv && sleep 2
+    done
+}
+
 function raptor_disks_make() {
     echo "starting auto partitioning"
     raptor_disks_make_boot &&
-    raptor_disks_make_uefi &&
     raptor_disks_make_root &&
     raptor_disks_make_swap &&
-    raptor_disks_make_home
+    raptor_disks_make_home &&
+    raptor_disks_make_uefi 
 }
 
 ## PREV PARTITION
