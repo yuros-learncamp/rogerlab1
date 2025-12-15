@@ -147,11 +147,12 @@ function raptor_disks_make_uefi() {
 
 function raptor_disks_make() {
     echo "starting auto partitioning"
+    raptor_disks_make_uefi &&
     raptor_disks_make_boot &&
     raptor_disks_make_root &&
     raptor_disks_make_swap &&
-    raptor_disks_make_home &&
-    raptor_disks_make_uefi 
+    raptor_disks_make_home
+    
 }
 
 ## PREV PARTITION
