@@ -20,7 +20,7 @@ function raptor_firms_prep_iwctl() {
 
     if [[ -z $( cat $raptor_packer | grep "networkmanager" ) ]]&&[[ -z $( cat $raptor_packer | grep "connman" ) ]];then
         if [[ -n $( rfkill | grep wireless ) ]];then
-            echo "iwd" >> "$pack_pacman"
+            echo "iwd" >> "$raptor_packer"
         fi
     fi
 }
@@ -28,39 +28,39 @@ function raptor_firms_prep_iwctl() {
 function raptor_firms_prep_firms() {
 
     if [[ ! -z $( lspci | grep 'AMD\|Amd') ]];then
-        echo "linux-firmware-amdgpu" >> "$pack_pacman"
+        echo "linux-firmware-amdgpu" >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'Atheros\|ATHEROS') ]];then
-        echo "linux-firmware-atheros" >> "$pack_pacman"
+        echo "linux-firmware-atheros" >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'Broadcom\|BROADCOM\|Cypress') ]];then
-        echo "linux-firmware-broadcom" >> "$pack_pacman"
+        echo "linux-firmware-broadcom" >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'Cirrus\|CIRRUS') ]];then
-        echo "linux-firmware-cirrus" >> "$pack_pacman"
+        echo "linux-firmware-cirrus" >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'Intel\|INTEL') ]];then
-        echo "linux-firmware-intel" >> "$pack_pacman"
+        echo "linux-firmware-intel" >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'MediaTek\|Ralink') ]];then
-        echo "linux-firmware-mediatek" >> "$pack_pacman"
+        echo "linux-firmware-mediatek" >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'NVIDIA\|Nvidia') ]];then
-        echo "linux-firmware-nvidia " >> "$pack_pacman"
+        echo "linux-firmware-nvidia " >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'ATI\|Radeon') ]];then
-        echo "linux-firmware-radeon " >> "$pack_pacman"
+        echo "linux-firmware-radeon " >> "$raptor_packer"
     fi
 
     if [[ ! -z $( lspci | grep 'Realtek') ]];then
-        echo "linux-firmware-realtek " >> "$pack_pacman"
+        echo "linux-firmware-realtek " >> "$raptor_packer"
     fi
 }
 
@@ -79,16 +79,16 @@ function raptor_firms_prep_graph_inte() {
 function raptor_firms_prep_graph() {
 
     if [[ ! -z $( lspci | grep 'VGA' | grep 'Intel Corporation') ]];then
-        echo "vulkan-intel" >> "$pack_pacman"
+        echo "vulkan-intel" >> "$raptor_packer"
     fi
 
     if [[ ! -z $(lspci | grep '3d\|NVIDIA') ]];then
-        echo "nvidia-utils" >> "$pack_pacman"
+        echo "nvidia-utils" >> "$raptor_packer"
         pacstrap /mnt nvidia-utils
     fi
 
     if [[ ! -z $(lspci | grep '3d\|RADEON') ]];then
-        echo "nvidia-radeon" >> "$pack_pacman"
+        echo "nvidia-radeon" >> "$raptor_packer"
     fi
 }
 
