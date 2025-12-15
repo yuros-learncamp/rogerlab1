@@ -3,6 +3,7 @@
 function raptor_firms_prep_bluez() {
     if [[ -n $( rfkill | grep bluetooth ) ]];then
         echo "bluez" >> "$raptor_packer"
+        echo "bluetooh module loaded"
     fi
 }
 
@@ -11,8 +12,10 @@ function raptor_firms_prep_ucode() {
 
     if [[ "$pack_ucodes" == "GenuineIntel" ]]; then
         echo "intel-ucode" >> "$raptor_packer"
+        echo "intel ucode loaded"
     elif [[ "$pack_ucodes" == "AuthenticAMD" ]]; then
         echo "amd-ucode"   >> "$raptor_packer"
+        echo "amd ucode loaded"
     fi
 }
 
@@ -21,6 +24,7 @@ function raptor_firms_prep_iwctl() {
     if [[ -z $( cat $raptor_packer | grep "networkmanager" ) ]]&&[[ -z $( cat $raptor_packer | grep "connman" ) ]];then
         if [[ -n $( rfkill | grep wireless ) ]];then
             echo "iwd" >> "$raptor_packer"
+            echo "iwd module loaded"
         fi
     fi
 }
@@ -29,41 +33,51 @@ function raptor_firms_prep_firms() {
 
     if [[ ! -z $( lspci | grep 'AMD\|Amd') ]];then
         echo "linux-firmware-amdgpu" >> "$raptor_packer"
+        echo "amd firmware loaded"
     fi
 
     if [[ ! -z $( lspci | grep 'Atheros\|ATHEROS') ]];then
         echo "linux-firmware-atheros" >> "$raptor_packer"
+        echo "atheros firmware loaded"
     fi
 
     if [[ ! -z $( lspci | grep 'Broadcom\|BROADCOM\|Cypress') ]];then
         echo "linux-firmware-broadcom" >> "$raptor_packer"
+        echo "broadcom firmware loaded"
     fi
 
     if [[ ! -z $( lspci | grep 'Cirrus\|CIRRUS') ]];then
         echo "linux-firmware-cirrus" >> "$raptor_packer"
+        echo "cirrus firmware loaded"
     fi
 
     if [[ ! -z $( lspci | grep 'Intel\|INTEL') ]];then
         echo "linux-firmware-intel" >> "$raptor_packer"
+        echo "intel firmware loaded"
     fi
 
     if [[ ! -z $( lspci | grep 'MediaTek\|Ralink') ]];then
         echo "linux-firmware-mediatek" >> "$raptor_packer"
+        echo "mediatek firmware loaded"
     fi
 
     if [[ ! -z $( lspci | grep 'NVIDIA\|Nvidia') ]];then
         echo "linux-firmware-nvidia" >> "$raptor_packer"
+        echo "nvidia firmware loaded"
     fi
 
     if [[ ! -z $( lspci | grep 'ATI\|Radeon') ]];then
         echo "linux-firmware-radeon" >> "$raptor_packer"
+        echo "radeon firmware loaded"
     fi
 
     if [[ ! -z $( lspci | grep 'Realtek') ]];then
         echo "linux-firmware-realtek" >> "$raptor_packer"
+        echo "realtek firmware loaded"
     fi
 
     echo "linux-firmware-other" >> "$raptor_packer"
+    echo "other firmware loaded"
      
 }
 
@@ -191,6 +205,10 @@ function raptor_firms_prep_nvidi() {
     raptor_firms_prep_nvidi_open &&
     raptor_firms_prep_nvidi_dkms
     nvidia_driver=true
+
+    echo "nvidia module: $nvidia_driver"
+    echo "nvidia driver: $nvidia_gpu_firm"
+    echo "Nvidia family: $nvidia_gpu_gens"
 }
 
 function raptor_firms_prep_radeo() {
@@ -213,6 +231,9 @@ function raptor_firms_prep_intel() {
 }
 
 function raptor_firms_prep() {
+    clear &&
+    echo "FIRMWARE LOAD"
+    echo "--------------------------------"
     raptor_firms_prep_bluez &&
     raptor_firms_prep_ucode &&
     raptor_firms_prep_iwctl &&
@@ -221,9 +242,7 @@ function raptor_firms_prep() {
     raptor_firms_prep_radeo &&
     raptor_firms_prep_nvidi
 
-    echo "Nvidia firm: $nvidia_gpu_firm"
-    echo "Nvidia gens: $nvidia_gpu_gens"
-    echo "Nvidia load: $nvidia_driver"
+
     exit
 }
 
