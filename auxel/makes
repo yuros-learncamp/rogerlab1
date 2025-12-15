@@ -83,7 +83,7 @@ function raptor_disks_make_uefi() {
 
 function raptor_disks_make_root() {
     
-    local label=$( lsblk -o label | grep "ROOT" | awk '{print $1}' )
+    local label=$( lsblk -o path,label | grep "ROOT" | awk '{print $1}' )
     local paths=$( lsblk -o path | grep $rootpath )
     local sizes=$distro_procsize
 
