@@ -63,6 +63,9 @@ function raptor_disks_make_boot() {
         echo "error boot partition not found"
         exit 1
     fi
+
+    echo $bootpath
+    exit 0
 }
 
 function raptor_disks_make_root() {
@@ -132,7 +135,7 @@ function raptor_disks_make_home() {
 ## dualboot validator team # @Al Muhdil Karim <karim@yuros.org> @Fawaz Rifqi Frasetia <fras@yuros.org>
 function raptor_disks_make_uefi() {
 
-    efipaths=($(lsblk -o path,fstype | grep vfat | awk '{print $1}'))
+    local efipaths=($(lsblk -o path,fstype | grep vfat | awk '{print $1}'))
 
     for path in "${efipaths[@]}"; do
         sudo mount $path /srv && sleep 2 && 
