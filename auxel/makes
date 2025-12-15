@@ -487,7 +487,7 @@ function raptor_disks_mont_boot() {
 function raptor_disks_mont_uefi() {
     if [[ -n $uefipath ]];then
         mount $uefipath /srv && sleep 1
-        mkdir /mnt/boot/guest &&
+        mkdir -p /mnt/boot/guest &&
         mount $uefipath /mnt/boot/guest &&
         mount --bind /mnt/boot/guest/EFI/Microsoft /mnt/boot/efi/ && sleep 1
         umount -R /srv && sleep 1
