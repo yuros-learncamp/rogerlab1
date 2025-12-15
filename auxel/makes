@@ -561,9 +561,16 @@ function raptor_cores_prep() {
 }
 
 
+function raptor_firms_post_grap() {
+
+    if [[ $gpudriver == "nvidia" ]];then
+        echo "options nvidia_drm modeset=1 fbdev=1" | sudo tee "/etc/modprobe.d/nvidia.conf" >/dev/null
+    fi
+}
 
 function raptor_firms_post() {
     echo "firmware post"
+    raptor_firms_post_grap
 }
 
 function craine_cores_post_host() {
