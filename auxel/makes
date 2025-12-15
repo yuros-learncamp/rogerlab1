@@ -185,7 +185,7 @@ function raptor_firms_prep_nvidi() {
         return
     fi
 
-        echo "Nvidia firm: $gpuDriver"
+    echo "Nvidia firm: $gpuDriver"
     echo "Nvidia gens: $gpuGen"
    
 
@@ -219,7 +219,6 @@ function raptor_firms_prep() {
     raptor_firms_prep_ucode &&
     raptor_firms_prep_iwctl &&
     raptor_firms_prep_firms && 
-    raptor_firms_prep_graph &&
     raptor_firms_prep_intel &&
     raptor_firms_prep_radeo &&
     raptor_firms_prep_nvidi
