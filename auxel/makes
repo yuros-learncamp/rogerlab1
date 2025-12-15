@@ -247,7 +247,6 @@ function raptor_disks_prep() {
     raptor_disks_form &&
     raptor_disks_mont &&
     echo "configration done"
-    exit
 }
 
 function raptor_kerns_prep_pure() {
