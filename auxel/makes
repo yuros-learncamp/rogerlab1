@@ -67,7 +67,7 @@ function raptor_disks_make_boot() {
     fi
 }
 
-function raptor_disks_make_root() {
+function raptor_disks_make_proc() {
     
     local label=$( lsblk -o path,label | grep "ROOT" | awk '{print $1}' )
     local paths=$( lsblk -o path | grep "$rootpath" )
@@ -162,7 +162,7 @@ function raptor_disks_make() {
     echo "starting auto partitioning"
     raptor_disks_make_uefi &&
     raptor_disks_make_boot &&
-    raptor_disks_make_root &&
+    raptor_disks_make_proc &&
     raptor_disks_make_swap &&
     raptor_disks_make_home
     
