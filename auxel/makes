@@ -538,9 +538,8 @@ function raptor_boots_post_secu() {
         echo "enroll device boot keys" && sleep 1
     fi
 
-    echo "signing systemd-boot efikeys"
     arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
-    sleep 2
+    echo "signing systemd-boot efi file" && sleep 2
 }
 
 ## boot loader @al muhdil karim <karim@yuros.org>, @achmad baihaqi <achmad@yuros.org>, @ibnu dzaky <dzaky@yuros.org>
