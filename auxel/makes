@@ -215,7 +215,6 @@ function raptor_disks_mont_boot() {
 }
 
 function raptor_disks_mont_uefi() {
-
     if [[ -n $uefipath ]];then
         mount $uefipath /srv
         sudo cp -r /srv/EFI/Microsoft /boot/efi/
@@ -248,6 +247,7 @@ function raptor_disks_prep() {
     raptor_disks_form &&
     raptor_disks_mont &&
     echo "configration done"
+    exit
 }
 
 function raptor_kerns_prep_pure() {
