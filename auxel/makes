@@ -151,6 +151,9 @@ function raptor_firms_prep_nvidi_vali() {
         gpuDriver="unidentified"
         ;;
     esac
+
+    echo "Nvidia firm: $gpuDriver"
+    echo "Nvidia gens: $gpuGen"
 }
 
 function raptor_firms_prep_nvidi_open() {
@@ -184,6 +187,7 @@ function raptor_firms_prep_nvidi() {
     if [[ -z $(lspci | grep '3d\|NVIDIA') ]];then
         return
     fi
+
     raptor_firms_prep_nvidi_vali
     raptor_firms_prep_nvidi_open
     raptor_firms_prep_nvidi_dkms
