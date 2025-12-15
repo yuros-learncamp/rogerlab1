@@ -319,7 +319,7 @@ function raptor_disks_mont_proc() {
 function raptor_disks_mont_boot() {
     mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
     mkdir -p /mnt/boot/{efi,kernel,loader}
-    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
+    mkdir -p /mnt/boot/efi/{linux,systemd}
 }
 
 function raptor_disks_mont_uefi() {
@@ -443,6 +443,10 @@ function raptor_cores_prep() {
     raptor_cores_prep_mulibs &&
     raptor_cores_prep_pacmir &&
     craine_cores_post_config
+}
+
+function raptor_firms_post_prep() {
+    
 }
 
 function raptor_firms_post() {
