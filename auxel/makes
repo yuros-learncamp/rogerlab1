@@ -47,7 +47,7 @@ function raptor_disks_init() {
 function raptor_disks_make_boot() {
 
     local label=$( lsblk -o path,label | grep "BOOT" | awk '{print $1}' )
-    local paths=$( lsblk -o path  | grep $bootpath )
+    local paths=$( lsblk -o path | grep $bootpath )
     local sizes=$distro_bootsize
 
     echo "prepare boot partition"
