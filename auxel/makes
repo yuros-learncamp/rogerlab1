@@ -446,7 +446,7 @@ function raptor_cores_prep() {
 }
 
 function raptor_firms_post_prep() {
-    
+    echo "nvidia"
 }
 
 function raptor_firms_post() {
