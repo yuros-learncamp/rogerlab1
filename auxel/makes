@@ -69,7 +69,7 @@ function raptor_firms_prep_firms() {
 
 function raptor_firms_prep_nvidi() {
 
-   if [[ -z $(lspci | grep '3d\|NVIDIA') ]];then
+    if [[ -z $(lspci | grep '3d\|NVIDIA') ]];then
         return
     fi
 
@@ -79,7 +79,7 @@ function raptor_firms_prep_nvidi() {
 function raptor_firms_prep_radeo() {
 
     if [[ -z $(lspci | grep '3d\|RADEON') ]];then
-       
+       return
     fi
 
     echo "vulkan-radeon" >> "$raptor_packer"
@@ -96,13 +96,13 @@ function raptor_firms_prep_intel() {
 
 
 function raptor_firms_prep() {
-    raptor_firms_prep_bluez
-    raptor_firms_prep_ucode
-    raptor_firms_prep_iwctl
-    raptor_firms_prep_firms
-    raptor_firms_prep_graph
-    raptor_firms_prep_intel
-    raptor_firms_prep_radeo
+    raptor_firms_prep_bluez &&
+    raptor_firms_prep_ucode &&
+    raptor_firms_prep_iwctl &&
+    raptor_firms_prep_firms && 
+    raptor_firms_prep_graph &&
+    raptor_firms_prep_intel &&
+    raptor_firms_prep_radeo &&
     raptor_firms_prep_nvidi
 }
 
