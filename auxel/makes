@@ -175,10 +175,15 @@ function raptor_firms_prep_nvidi_open() {
         return
     fi
 
-    echo "nvidia-open-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd" >> "$raptor_packer"
+    echo "libglvnd" >> "$raptor_packer"
+    echo "nvidia-utils" >> "$raptor_packer"
+    echo "opencl-nvidia" >> "$raptor_packer"
+    echo "nvidia-settings" >> "$raptor_packer"
+    echo "nvidia-open-dkms" >> "$raptor_packer"
 
     if [[ -n $distro_libs32 ]]&&[[ $distro_libs32 == true ]];then
-        echo "lib32-nvidia-utils lib32-opencl-nvidia" >> "$raptor_packer"
+        echo "lib32-nvidia-utils" >> "$raptor_packer"
+        echo "lib32-opencl-nvidia" >> "$raptor_packer"
     fi
 }
 
@@ -188,10 +193,15 @@ function raptor_firms_prep_nvidi_dkms() {
         return
     fi
 
-    echo "nvidia-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd" >> "$raptor_packer"
-
+    echo "libglvnd" >> "$raptor_packer"
+    echo "nvidia-dkms" >> "$raptor_packer"
+    echo "nvidia-utils" >> "$raptor_packer"
+    echo "opencl-nvidia" >> "$raptor_packer"
+    echo "nvidia-settings" >> "$raptor_packer"
+   
     if [[ -n $distro_libs32 ]]&&[[ $distro_libs32 == true ]];then
-        echo "lib32-nvidia-utils lib32-opencl-nvidia" >> "$raptor_packer"
+        echo "lib32-nvidia-utils" >> "$raptor_packer"
+        echo "lib32-opencl-nvidia" >> "$raptor_packer"
     fi
 }
 
@@ -204,8 +214,8 @@ function raptor_firms_prep_nvidi() {
     raptor_firms_prep_nvidi_vali &&
     raptor_firms_prep_nvidi_open &&
     raptor_firms_prep_nvidi_dkms
+   
     nvidia_driver=true
-
     echo "nvidia module: $nvidia_driver"
     echo "nvidia driver: $nvidia_gpu_firm"
     echo "Nvidia family: $nvidia_gpu_gens"
