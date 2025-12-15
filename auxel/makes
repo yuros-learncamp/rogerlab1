@@ -196,6 +196,7 @@ function raptor_disks_form_home() {
 function raptor_disks_form() {
     clear &&
     echo "FORMATING STORAGE"
+    echo "--------------------------------"
     raptor_disks_form_boot &&
     raptor_disks_form_proc &&
     raptor_disks_form_swap &&
@@ -250,7 +251,7 @@ function raptor_disks_prep() {
     raptor_disks_make &&
     raptor_disks_form &&
     raptor_disks_mont &&
-    echo "configration done"
+    echo "storage configured"
 }
 
 function raptor_kerns_prep_pure() {
