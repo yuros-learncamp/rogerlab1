@@ -154,6 +154,7 @@ function raptor_firms_prep_nvidi_vali() {
 
     echo "Nvidia firm: $gpuDriver"
     echo "Nvidia gens: $gpuGen"
+    exit
 }
 
 function raptor_firms_prep_nvidi_open() {
