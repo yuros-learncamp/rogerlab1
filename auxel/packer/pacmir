@@ -1,4 +1,5 @@
 linux-zen
+linux-zen-headers
 mkinitcpio
 sbctl
 networkmanager

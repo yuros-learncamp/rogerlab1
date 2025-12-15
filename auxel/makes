@@ -67,11 +67,103 @@ function raptor_firms_prep_firms() {
      
 }
 
+
+function raptor_firms_prep_nvidi_vali() {
+    
+}
+
+
 function raptor_firms_prep_nvidi() {
 
     if [[ -z $(lspci | grep '3d\|NVIDIA') ]];then
         return
     fi
+
+    function raptor_firms_post_prep() {
+    echo "nvidia"
+
+    # Default values
+    gpuGen="Unknown"
+    gpuDriver="Unknown"
+
+    gpuInfo=$(lspci -nn | grep -i 'VGA.*NVIDIA')
+    gpuName=$(echo "${gpuInfo}" | sed -E 's/.*NVIDIA Corporation //; s/ \[.*//')
+
+    case "${gpuName}" in
+    *"GB10"* | *"GB20"*)
+        gpuGen="Blackwell"
+        gpuDriver="manual"
+        ;;
+    *"GH10"*)
+        gpuGen="Hopper"
+        gpuDriver="manual"
+        ;;
+    *"AD10"*)
+        gpuGen="Ada Lovelace"
+        gpuDriver="manual"
+        ;;
+    *"GA10"*)
+        gpuGen="Ampere"
+        gpuDriver="manual"
+        ;;
+    *"TU10"* | *"TU11"*)
+        gpuGen="Turing"
+        gpuDriver="manual"
+        ;;
+    *"GV10"*)
+        gpuGen="Volta"
+        gpuDriver="nvidia-dkms"
+        ;;
+    *"GP10"*)
+        gpuGen="Pascal"
+        gpuDriver="nvidia-dkms"
+        ;;
+    *"GM10"* | *"GM20"*)
+        gpuGen="Maxwell"
+        gpuDriver="nvidia-dkms"
+        ;;
+    *"EXK107"* | *"GK10"* | *"GK11"* | *"GK18"* | *"GK20"* | *"GK21"*)
+        gpuGen="Kepler"
+        gpuDriver="nvidia-470xx-dkms"
+        ;;
+    *"EXMF1"* | *"GF10"* | *"GF11"*)
+        gpuGen="Fermi"
+        gpuDriver="nvidia-390xx-dkms"
+        ;;
+    *"Kal-El"* | *"Tegra 2"* | *"Wayne"*)
+        gpuGen="VLIW Vec4"
+        gpuDriver="nvidia-390xx-dkms"
+        ;;
+    *"C77"* | *"C78"* | *"C79"* | *"C7A"* | *"G80"* | *"G84"* | *"G86"* | *"G92"* | *"G94"* | *"G96"* | *"G98"* | *"ION"* | *"C87"* | *"C89"* | *"GT20"* | *"GT21"*)
+        # C7A-ION, NVIDIA ION
+        gpuGen="Tesla"
+        gpuDriver="nvidia-340xx-dkms"
+        ;;
+    *"C51"* | *"C61"* | *"C67"* | *"C68"* | *"C73"* | *"G70"* | *"G71"* | *"G72"* | *"G73"* | *"NV40"* | *"NV41"* | *"NV42"* | *"NV43"* | *"NV44"* | *"NV45"* | *"NV48"* | *"RSX"*)
+        gpuGen="Curie"
+        gpuDriver="unsupported"
+        ;;
+    *"NV30"* | *"NV31"* | *"NV34"* | *"NV35"* | *"NV36"* | *"NV37"* | *"NV38"* | *"NV39"*)
+        gpuGen="Rankine"
+        gpuDriver="unsupported"
+        ;;
+    *"NV20"* | *"NV25"* | *"NV28"* | *"NV2A"*)
+        gpuGen="Kelvin"
+        gpuDriver="unsupported"
+        ;;
+    *"Crush1"* | *"NV10"* | *"NV11"* | *"NV15"* | *"NV17"* | *"NV18"*)
+        gpuGen="Celsius"
+        gpuDriver="unsupported"
+        ;;
+    *"NV4"* | *"NV5"*)
+        gpuGen="Fahrenheit"
+        gpuDriver="unsupported"
+        ;;
+    *)
+        gpuGen="Unknown"
+        gpuDriver="unidentified"
+        ;;
+    esac
 
     echo "nvidia-utils" >> "$raptor_packer"
 }
@@ -445,9 +537,7 @@ function raptor_cores_prep() {
     craine_cores_post_config
 }
 
-function raptor_firms_post_prep() {
-    echo "nvidia"
-}
+
 
 function raptor_firms_post() {
     echo "firmware post"
