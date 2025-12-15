@@ -552,7 +552,7 @@ function raptor_boots_post_boot() {
     echo "setup systemd boot"
     source /mnt/usr/lib/os-release
     echo "root=$rootpath" > /mnt/etc/cmdline.d/01-boot.conf && 
-    bootctl --boot-path=/mnt/boot/ --esp-path=/mnt/boot --efi-boot-option-description=$ID install
+    bootctl --path=/mnt/boot/ --efi-boot-option-description=$ID install
     echo "installation systemd boot"
     sleep 2
 }
