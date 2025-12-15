@@ -209,7 +209,6 @@ function raptor_firms_prep_intel() {
     echo "vulkan-intel" >> "$raptor_packer"
 }
 
-
 function raptor_firms_prep() {
     raptor_firms_prep_bluez &&
     raptor_firms_prep_ucode &&
@@ -563,8 +562,23 @@ function raptor_cores_prep() {
 
 function raptor_firms_post_grap() {
 
+    if [[ $gpudriver != "nvidia" ]];then
+        rm -f "/mnt/etc/modprobe.d/nvidia.conf"
+    fi
+
     if [[ $gpudriver == "nvidia" ]];then
-        echo "options nvidia_drm modeset=1 fbdev=1" | sudo tee "/etc/modprobe.d/nvidia.conf" >/dev/null
+        rm -f "/mnt/etc/mkinitcpio.d/radeon.conf"
+        rm -f "/mnt/etc/mkinitcpio.d/default.conf"
+        mv -f "/mnt/etc/mkinitcpio.d/nvidia.conf" "/mnt/etc/mkinitcpio.d/default.conf"
+    
+    elif [[ $gpudriver == "radeon" ]];then
+        rm -f "/mnt/etc/mkinitcpio.d/nvidia.conf"
+        rm -f "/mnt/etc/mkinitcpio.d/default.conf"
+        mv -f "/mnt/etc/mkinitcpio.d/radeon.conf" "/mnt/etc/mkinitcpio.d/default.conf"
+
+    else
+        rm -f "/mnt/etc/mkinitcpio.d/nvidia.conf"
+        rm -f "/mnt/etc/mkinitcpio.d/radeon.conf"
     fi
 }
 
