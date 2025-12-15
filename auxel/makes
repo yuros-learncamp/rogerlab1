@@ -65,24 +65,41 @@ function raptor_disks_init() {
     raptor_disks_init_swip
 }
 
-
 ## MAKE PARTITION
+function raptor_disks_make_boot() {
+
+    local label=$( lsblk -o label | grep "BOOT" | awk '{print $1}' )
+    local paths=$( lsblk -o path  | grep $bootpath )
+    local sizes=$distro_bootsize
+
+    echo "prepare boot partition"
+
+    if [[ -z $label ]]&&[[ -z $paths ]]; then
+        echo -e "n\np\n\n\n+$sizes\nt\n\n1\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
+        bootpath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
+    elif [[ -n $paths ]];then
+        bootpath=$paths
+    elif [[ -n $label ]];then
+        bootpath=$label
+    else
+        echo "error boot partition not found"
+        exit 1
+    fi
+}
+
 function raptor_disks_make_uefi() {
 
     if [[ $dualboot == true ]];then
         return
     fi 
 
-    local label=$( lsblk -o label | grep "BOOT" | awk '{print $1}' )
+    local label=$( lsblk -o label | grep "UEFI" | awk '{print $1}' )
     local paths=$( lsblk -o path  | grep $uefipath )
     local sizes=$distro_uefisize
 
     echo "prepare uefi partition"
 
-    if [[ -z $label ]]&&[[ -z $paths ]]; then
-        echo -e "n\np\n\n\n+$sizes\nt\n\n1\nw" | fdisk "$loadpath" > /dev/null 2>&1 && sleep 2
-        uefipath=$(lsblk -o path | grep "$loadpath" | tail -n 1) && sleep 1
-    elif [[ -n $paths ]];then
+    if [[ -n $paths ]];then
         uefipath=$paths
     elif [[ -n $label ]];then
         uefipath=$label
@@ -158,6 +175,7 @@ function raptor_disks_make_home() {
 
 function raptor_disks_make() {
     echo "starting auto partitioning"
+    raptor_disks_make_boot &&
     raptor_disks_make_uefi &&
     raptor_disks_make_root &&
     raptor_disks_make_swap &&
@@ -184,13 +202,9 @@ function raptor_disks_prev() {
 } 
 
 ## FORM PARTITION
-function raptor_disks_form_uefi() {
-
-    echo " duaboot status : "$dualboot
-    if [[ $dualboot == false ]];then
-        echo "format boot partition"
-        mkfs.vfat -F32 -S 4096 -n "BOOT" $uefipath
-    fi
+function raptor_disks_form_boot() {
+    echo "format boot partition"
+    mkfs.vfat -F32 -S 4096 -n "BOOT" $bootpath
 }
 
 function raptor_disks_form_root() {
@@ -213,7 +227,7 @@ function raptor_disks_form_home() {
 }
 
 function raptor_disks_form() {
-    raptor_disks_form_uefi &&
+    raptor_disks_form_boot &&
     raptor_disks_form_root &&
     raptor_disks_form_swap &&
     raptor_disks_form_home
@@ -226,16 +240,18 @@ function raptor_disks_mont_root() {
     mkdir -p /mnt/{home,boot}
 }
 
+function raptor_disks_mont_boot() {
+    mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
+    mkdir -p /mnt/boot/{efi,kernel,loader}
+    mkdir -p /mnt/boot/efi/{boot,linux,systemd}
+}
+
 function raptor_disks_mont_uefi() {
 
-    if [[ $dualboot == true ]];then
-        mkdir -p /mnt/boot/{efi,kernel}
-        mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot/efi
-        mkdir -p /mnt/boot/efi/EFI/{linux,systemd}
-    else
-        mount -o uid=0,gid=0,dmask=007,fmask=007 $uefipath /mnt/boot
-        mkdir -p /mnt/boot/{efi,kernel,loader}
-        mkdir -p /mnt/boot/efi/{boot,linux,systemd}
+    if [[ -n $uefipath ]];then
+        mount $uefipath /srv
+        sudo cp -r /srv/EFI/Microsoft /boot/efi/
+        umount -R /srv
     fi
 }
 
@@ -251,7 +267,7 @@ function raptor_disks_mont_swap() {
 
 function raptor_disks_mont() {
     raptor_disks_mont_root &&
-    raptor_disks_mont_uefi &&
+    raptor_disks_mont_boot &&
     raptor_disks_mont_home &&
     raptor_disks_mont_swap
 }
@@ -264,6 +280,12 @@ function raptor_disks_prep() {
     raptor_disks_form &&
     raptor_disks_mont &&
      echo "configration done"
+}
+
+
+function raptor_boots_prep() {
+    sleep 2 && clear
+    echo "Booting module installation"
 }
 
 function raptor_cores_prep_mulibs() {
@@ -313,11 +335,6 @@ function raptor_kerns_prep() {
     sleep 2 && clear
     echo "Kernel module installation"
     raptor_kerns_prep_pure
-}
-
-function raptor_boots_prep() {
-    sleep 2 && clear
-    echo "Booting module installation"
 }
 
 function raptor_neter_prep() {
@@ -407,9 +424,7 @@ function raptor_cores_post() {
     raptor_cores_post_time
     raptor_cores_post_user
     raptor_cores_post_srvc
-
     echo "Base module configured"
-
 }
 
 function raptor_kerns_post_conf() {
@@ -502,6 +517,24 @@ function raptor_boots_post_secs() {
 function raptor_boots_post_boot() {
     echo "kernel parameter boot configuration"
     echo "root=$rootpath" > /mnt/etc/cmdline.d/01-boot.conf && 
+    
+    if [[ $dualboot == true ]];then
+        bootctl --path=/mnt/boot/efi install
+        mv -f /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak
+        cp /mnt/boot/efi/EFI/systemd/systemd-bootx64.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
+        arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$| arch-chroot /mnt sbctl sign -s "\1"|e'
+    else
+        rm -fr /boot/efi/loader &&
+        bootctl --path=/mnt/boot install
+    fi
+
+    echo "installation systemd boot"
+
+}
+
+function raptor_boots_post_boot_old() {
+    echo "kernel parameter boot configuration"
+    echo "root=$rootpath" > /mnt/etc/cmdline.d/01-boot.conf && 
     echo "installation systemd boot"
 
     if [[ $dualboot == true ]];then
@@ -515,41 +548,8 @@ function raptor_boots_post_boot() {
     fi
 }
 
-function raptor_boots_post_secs_dual () {
-    arch-chroot /mnt sbctl sign --save /boot/efi/EFI/Boot/bootx64.efi &&
-    arch-chroot /mnt sbctl sign --save /boot/efi/EFI/systemd/systemd-bootx64.efi &&
-    for efi in /mnt/boot/efi/EFI/linux/*; do
-        arch-chroot /mnt sbctl sign --save /boot/efi/EFI/linux/$efi
-    done
-}
-
-function raptor_boots_post_secs_mono () {
-
-    arch-chroot /mnt sbctl sign --save /boot/efi/boot/bootx64.efi &&
-    arch-chroot /mnt sbctl sign --save /boot/efi/systemd/systemd-bootx64.efi &&
-    for efi in /mnt/boot/efi/linux/*; do
-        echo $efi > /mnt/sign
-        arch-chroot /mnt sbctl sign --save /boot/efi/linux/$( cat /mnt/sign )
-    done
-}
-
-function raptor_boots_post_secs_old() {
-
-    echo "setup secure boot"
-    arch-chroot /mnt sbctl create-keys &&
-    arch-chroot /mnt sbctl enroll-keys -m -i -f &&
-
-    if [[ $dualboot == true ]];then
-        raptor_boots_post_secs_dual
-    else
-        raptor_boots_post_secs_mono
-    fi
-
-    for vml in $($(ls /mnt/boot/kernel/ | grep vmlinuz )); do
-        arch-chroot /mnt sbctl sign --save /boot/kernel/$vml
-    done
-
-    arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$|sbctl sign -s "\1"|e'
+function raptor_boots_post_srvc() {
+    arch-chroot /mnt systemctl enable systemd-boot-update.service
 }
 
 function raptor_boots_post() {
@@ -558,16 +558,17 @@ function raptor_boots_post() {
     raptor_boots_post_prep
     raptor_boots_post_secs
     raptor_boots_post_boot
+    raptor_boots_post_srvc
 }
 
-function raptor_audio_post_serve() {
+function raptor_audio_post_srvc() {
     arch-chroot /mnt systemctl enable --global pipewire-pulse.service
 }
 
 function raptor_audio_post() {
     sleep 2 && clear
     echo "Audio module configuration"
-    raptor_audio_post_serve 
+    raptor_audio_post_srvc 
     echo "Audio module configured"
 }
 
