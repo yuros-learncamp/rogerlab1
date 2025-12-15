@@ -81,7 +81,7 @@ function raptor_firms_prep_firms() {
 
 function raptor_firms_prep_nvidi_vali() {
 
-    # Default values
+    # default values
     nvidia_gpu_gens="Unknown"
     nvidia_gpu_firm="Unknown"
 
@@ -163,8 +163,6 @@ function raptor_firms_prep_nvidi_vali() {
         nvidia_gpu_firm="unidentified"
         ;;
     esac
-
- 
 }
 
 function raptor_firms_prep_nvidi_open() {
@@ -225,8 +223,15 @@ function raptor_firms_prep_radeo() {
        return
     fi
 
+    radeon_driver=true
+    echo "mesa" >> "$raptor_packer"
     echo "vulkan-radeon" >> "$raptor_packer"
-    gpudriver="radeon"
+    echo "xf86-video-amdgpu" >> "$raptor_packer"
+
+    if [[ -n $distro_libs32 ]]&&[[ $distro_libs32 == true ]];then
+        echo "lib32-mesa" >> "$raptor_packer"
+        echo "lib32-vulkan-radeon" >> "$raptor_packer"
+    fi
 }
 
 function raptor_firms_prep_intel() {
@@ -235,7 +240,18 @@ function raptor_firms_prep_intel() {
         return
     fi
 
+    intels_driver=true
+
+    if [[ -z $( cat $raptor_packer | grep mesa ) ]];then
+        echo "mesa" >> "$raptor_packer"
+    fi
+    
     echo "vulkan-intel" >> "$raptor_packer"
+
+    if [[ -n $distro_libs32 ]]&&[[ $distro_libs32 == true ]];then
+        echo "lib32-mesa" >> "$raptor_packer"
+        echo "lib32-vulkan-intel" >> "$raptor_packer"
+    fi
 }
 
 function raptor_firms_prep() {
@@ -471,7 +487,9 @@ function raptor_disks_mont_boot() {
 function raptor_disks_mont_uefi() {
     if [[ -n $uefipath ]];then
         mount $uefipath /srv && sleep 1
-        sudo cp -r /srv/EFI/Microsoft /mnt/boot/efi/ && sleep 1
+        mkdir /mnt/boot/guest &&
+        mount $uefipath /mnt/boot/guest &&
+        mount --bind /mnt/boot/guest/EFI/Microsoft /mnt/boot/efi/ && sleep 1
         umount -R /srv && sleep 1
     fi
 }
