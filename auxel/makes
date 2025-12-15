@@ -8,7 +8,6 @@ function raptor_disks_init_pure() {
     fi
 }
 
-
 function raptor_disks_init_swip() {
 
     if [[ -n $bootpath ]];then
@@ -257,50 +256,6 @@ function raptor_disks_prep() {
     exit
 }
 
-
-function raptor_boots_prep() {
-    sleep 2 && clear
-    echo "Booting module installation"
-}
-
-function raptor_cores_prep_mulibs() {
-
-    local ismultilib=$(cat /etc/pacman.conf | grep "[multilib]")
-
-    if [[ -n $distro_libs32 ]]&&[[ $distro_libs32 == true ]];then
-        echo "" >>  "/etc/pacman.conf" &&
-        echo "[multilib]" >> "/etc/pacman.conf" &&
-        echo "Include = /etc/pacman.d/mirrorlist" >> "/etc/pacman.conf"
-        echo "enable multilib"
-    fi
-}
-
-function raptor_cores_prep_pacmir() {
-    test -e $pack_pacman && pacstrap /mnt - < $pack_pacman
-    if [ $? -ne 0 ]; then
-        echo "Error: raptor package installation failed." >&2
-        exit 1
-    fi
-}
-
-function craine_cores_post_config() {
-    genfstab -U /mnt > /mnt/etc/fstab &&
-    cp -fr $buildconf/* /mnt
-    if [ $? -ne 0 ]; then
-        echo "Error: raptor configuration installation failed." >&2
-        exit 1
-    fi
-}
-
-function raptor_cores_prep() {
-    
-    sleep 2 && clear
-    echo "Base module installation"
-    raptor_cores_prep_mulibs &&
-    raptor_cores_prep_pacmir &&
-    craine_cores_post_config
-}
-
 function raptor_kerns_prep_pure() {
     rm -f /mnt/etc/mkinitcpio.conf &&
     rm -fr /mnt/etc/mkinitcpio.conf.d 
@@ -310,6 +265,12 @@ function raptor_kerns_prep() {
     sleep 2 && clear
     echo "Kernel module installation"
     raptor_kerns_prep_pure
+}
+
+
+function raptor_boots_prep() {
+    sleep 2 && clear
+    echo "Booting module installation"
 }
 
 function raptor_neter_prep() {
@@ -342,9 +303,42 @@ function raptor_distr_prep() {
     echo "Distro module installation"
 }
 
-function raptor_disks_post() {
+function raptor_cores_prep_mulibs() {
+
+    local ismultilib=$(cat /etc/pacman.conf | grep "[multilib]")
+
+    if [[ -n $distro_libs32 ]]&&[[ $distro_libs32 == true ]];then
+        echo "" >>  "/etc/pacman.conf" &&
+        echo "[multilib]" >> "/etc/pacman.conf" &&
+        echo "Include = /etc/pacman.d/mirrorlist" >> "/etc/pacman.conf"
+        echo "enable multilib"
+    fi
+}
+
+function raptor_cores_prep_pacmir() {
+    test -e $raptor_packer && pacstrap /mnt - < $raptor_packer
+    if [ $? -ne 0 ]; then
+        echo "Error: raptor package installation failed." >&2
+        exit 1
+    fi
+}
+
+function craine_cores_post_config() {
+    genfstab -U /mnt > /mnt/etc/fstab &&
+    cp -fr $buildconf/* /mnt
+    if [ $? -ne 0 ]; then
+        echo "Error: raptor configuration installation failed." >&2
+        exit 1
+    fi
+}
+
+function raptor_cores_prep() {
+    
     sleep 2 && clear
-    echo "Partition configuration"
+    echo "Base module installation"
+    raptor_cores_prep_mulibs &&
+    raptor_cores_prep_pacmir &&
+    craine_cores_post_config
 }
 
 function craine_cores_post_host() {
@@ -402,6 +396,11 @@ function raptor_cores_post() {
     echo "Base module configured"
 }
 
+function raptor_disks_post() {
+    sleep 2 && clear
+    echo "Partition configuration"
+}
+
 function raptor_kerns_post_conf() {
     
     echo "dualboot : $dualboot"
@@ -421,6 +420,67 @@ function raptor_kerns_post() {
     sleep 2 && clear
     echo "Kernel module configuration"
     raptor_kerns_post_conf
+}
+
+function raptor_neter_post_srvc() {
+    arch-chroot /mnt systemctl enable sshd
+    arch-chroot /mnt systemctl enable NetworkManager
+    arch-chroot /mnt systemctl enable dnsmasq
+    arch-chroot /mnt systemctl disable NetworkManager-wait-online.service
+}
+
+function raptor_neter_post() {
+    sleep 2 && clear
+    echo "Network module configuration"
+    raptor_neter_post_srvc
+}
+
+function raptor_audio_post_srvc() {
+    arch-chroot /mnt systemctl enable --global pipewire-pulse.service
+}
+
+function raptor_audio_post() {
+    sleep 2 && clear
+    echo "Audio module configuration"
+    raptor_audio_post_srvc 
+    echo "Audio module configured"
+}
+
+
+
+function raptor_deskt_post_serve() {
+    arch-chroot /mnt systemctl enable sddm
+    arch-chroot /mnt systemctl enable bluetooth.service
+}
+
+
+
+function raptor_deskt_post() {
+    sleep 2 && clear
+    echo "Desktop module configuration"
+    raptor_deskt_post_serve
+    echo "Desktop module configured"
+}
+
+function raptor_mitig_post() {
+    sleep 2 && clear
+    echo "Mitigation module configuration"
+}
+
+function raptor_secur_post_serve() {
+    arch-chroot /mnt systemctl enable firewalld
+}
+
+function raptor_secur_post() {
+    sleep 2 && clear
+    echo "Security module configuration"
+    raptor_secur_post_serve
+    echo "Security module configured"
+}
+
+function raptor_distr_post() {
+    sleep 2 && clear
+    echo "Distro module configuration"
 }
 
 function raptor_boots_post_prep() {
@@ -497,7 +557,7 @@ function raptor_boots_post_boot() {
 }
 
 function raptor_boots_post_srvc() {
-     echo "enable boot service"
+    echo "enable boot service"
     arch-chroot /mnt systemctl enable systemd-boot-update.service
 }
 
@@ -508,67 +568,6 @@ function raptor_boots_post() {
     raptor_boots_post_secu
     raptor_boots_post_boot
     raptor_boots_post_srvc
-}
-
-function raptor_audio_post_srvc() {
-    arch-chroot /mnt systemctl enable --global pipewire-pulse.service
-}
-
-function raptor_audio_post() {
-    sleep 2 && clear
-    echo "Audio module configuration"
-    raptor_audio_post_srvc 
-    echo "Audio module configured"
-}
-
-
-
-function raptor_deskt_post_serve() {
-    arch-chroot /mnt systemctl enable sddm
-    arch-chroot /mnt systemctl enable bluetooth.service
-}
-
-
-
-function raptor_deskt_post() {
-    sleep 2 && clear
-    echo "Desktop module configuration"
-    raptor_deskt_post_serve
-    echo "Desktop module configured"
-}
-
-function raptor_mitig_post() {
-    sleep 2 && clear
-    echo "Mitigation module configuration"
-}
-
-function raptor_neter_post_srvc() {
-    arch-chroot /mnt systemctl enable sshd
-    arch-chroot /mnt systemctl enable NetworkManager
-    arch-chroot /mnt systemctl enable dnsmasq
-    arch-chroot /mnt systemctl disable NetworkManager-wait-online.service
-}
-
-function raptor_neter_post() {
-    sleep 2 && clear
-    echo "Network module configuration"
-    raptor_neter_post_srvc
-}
-
-function raptor_secur_post_serve() {
-    arch-chroot /mnt systemctl enable firewalld
-}
-
-function raptor_secur_post() {
-    sleep 2 && clear
-    echo "Security module configuration"
-    raptor_secur_post_serve
-    echo "Security module configured"
-}
-
-function raptor_distr_post() {
-    sleep 2 && clear
-    echo "Distro module configuration"
 }
 
 function raptor_prep_install() {

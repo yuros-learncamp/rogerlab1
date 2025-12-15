@@ -26,30 +26,37 @@ test -e "$buildauxe/makos" && source "$buildauxe/makos"
 
 
 ## PACKAGES
-pack_pacmir="$buildpack/pacmir"
-pack_packfa="$buildpack/packfa"
-pack_packco="$buildpack/packco"
-pack_pacman="$buildpack/instal"
+raptor_packer="$buildpack/pacmir"
+raptor_packfa="$buildpack/packfa"
+raptor_packco="$buildpack/packco"
 
 
 ## microcode
 pack_ucodes=$(grep "vendor_id" /proc/cpuinfo | head -n 1 | awk '{print $3}')
 
 if [[ "$pack_ucodes" == "GenuineIntel" ]]; then
-    echo "intel-ucode" > "$pack_pacman"
+    echo "intel-ucode" >> "$raptor_packer"
 elif [[ "$pack_ucodes" == "AuthenticAMD" ]]; then
-    echo "amd-ucode"   > "$pack_pacman"
+    echo "amd-ucode"   >> "$raptor_packer"
 fi
 
 
 ## bluetooth
+if [[ -n $( rfkill | grep bluetooth ) ]];then
+    echo "bluez" >> "$raptor_packer"
+fi
 
 
-## graphical
+## wireless
+if [[ -z $( cat $raptor_packer | grep "networkmanager" ) ]]&&[[ -z $( cat $raptor_packer | grep "connman" ) ]];then
+    if [[ -n $( rfkill | grep wireless ) ]];then
+        echo "iwd" >> "$raptor_packer"
+    fi
+fi
 
 
-## gathering
-cat $pack_pacmir >> $pack_pacman
+## displays
+
 
 
 ## PROFILING
