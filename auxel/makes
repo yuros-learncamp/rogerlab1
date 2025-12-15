@@ -528,7 +528,6 @@ function raptor_boots_post_prep() {
 function raptor_boots_post_secu() {
 
     echo "setup secure boot"
-    arch-chroot /mnt sbctl reset &&
     arch-chroot /mnt sbctl create-keys &&
    
     if [[ -n $uefipath ]];then
