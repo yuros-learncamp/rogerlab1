@@ -539,7 +539,7 @@ function raptor_boots_post_secu() {
         arch-chroot /mnt sbctl enroll-keys -m -i
         echo "enroll oem boot keys" && sleep 1
     else
-        arch-chroot /mnt sbctl enroll-keys -i -f
+        arch-chroot /mnt sbctl enroll-keys -f
         echo "enroll device boot keys" && sleep 1
     fi
 
