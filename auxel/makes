@@ -241,9 +241,7 @@ function raptor_firms_prep() {
     raptor_firms_prep_intel &&
     raptor_firms_prep_radeo &&
     raptor_firms_prep_nvidi
-
-
-    exit
+    sleep 2
 }
 
 ## PREP PARTITION
