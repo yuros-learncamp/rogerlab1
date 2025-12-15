@@ -31,34 +31,6 @@ raptor_packfa="$buildpack/packfa"
 raptor_packco="$buildpack/packco"
 
 
-## microcode
-pack_ucodes=$(grep "vendor_id" /proc/cpuinfo | head -n 1 | awk '{print $3}')
-
-if [[ "$pack_ucodes" == "GenuineIntel" ]]; then
-    echo "intel-ucode" >> "$raptor_packer"
-elif [[ "$pack_ucodes" == "AuthenticAMD" ]]; then
-    echo "amd-ucode"   >> "$raptor_packer"
-fi
-
-
-## bluetooth
-if [[ -n $( rfkill | grep bluetooth ) ]];then
-    echo "bluez" >> "$raptor_packer"
-fi
-
-
-## wireless
-if [[ -z $( cat $raptor_packer | grep "networkmanager" ) ]]&&[[ -z $( cat $raptor_packer | grep "connman" ) ]];then
-    if [[ -n $( rfkill | grep wireless ) ]];then
-        echo "iwd" >> "$raptor_packer"
-    fi
-fi
-
-
-## displays
-
-
-
 ## PROFILING
 test -e "$buildprof/$3" && source "$buildprof/$3" 
 echo "username : $username"
