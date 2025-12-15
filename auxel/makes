@@ -78,7 +78,7 @@ function raptor_firms_prep_nvidi() {
 
 function raptor_firms_prep_radeo() {
 
-    if [[ -z $(lspci | grep '3d\|RADEON') ]];then
+    if [[ -z $(lspci | grep '3d\|ATI\|RADEON') ]];then
        return
     fi
 
