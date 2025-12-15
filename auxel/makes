@@ -63,9 +63,6 @@ function raptor_disks_make_boot() {
         echo "error boot partition not found"
         exit 1
     fi
-
-    echo $bootpath
-    exit 0
 }
 
 function raptor_disks_make_root() {
@@ -86,6 +83,9 @@ function raptor_disks_make_root() {
         echo "error root partition not found"
         exit 1
     fi
+
+    echo $rootpath
+    exit 0
 }
 
 function raptor_disks_make_swap() {
