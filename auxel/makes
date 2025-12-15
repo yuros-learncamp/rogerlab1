@@ -185,6 +185,10 @@ function raptor_firms_prep_nvidi() {
         return
     fi
 
+        echo "Nvidia firm: $gpuDriver"
+    echo "Nvidia gens: $gpuGen"
+   
+
     raptor_firms_prep_nvidi_vali
     raptor_firms_prep_nvidi_open
     raptor_firms_prep_nvidi_dkms
@@ -220,9 +224,7 @@ function raptor_firms_prep() {
     raptor_firms_prep_radeo &&
     raptor_firms_prep_nvidi
 
-    echo "Nvidia firm: $gpuDriver"
-    echo "Nvidia gens: $gpuGen"
-    exit
+     exit
 }
 
 ## PREP PARTITION
