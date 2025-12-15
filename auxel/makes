@@ -187,6 +187,7 @@ function raptor_firms_prep_nvidi() {
     raptor_firms_prep_nvidi_vali
     raptor_firms_prep_nvidi_open
     raptor_firms_prep_nvidi_dkms
+    gpudriver="nvidia"
 }
 
 function raptor_firms_prep_radeo() {
@@ -196,6 +197,7 @@ function raptor_firms_prep_radeo() {
     fi
 
     echo "vulkan-radeon" >> "$raptor_packer"
+    gpudriver="radeon"
 }
 
 function raptor_firms_prep_intel() {
@@ -624,10 +626,19 @@ function raptor_disks_post() {
     echo "Partition configuration"
 }
 
+function raptor_kerns_post_grap() {
+
+    if [[ $gpudriver == "nvidia" ]];then
+        sed -i 's/^MODULES=(\([^)]*\))/MODULES=(\1 nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' "/etc/mkinitcpio.d/default.conf" &&
+        sudo sed -i 's/\bkms \b//g' "/etc/mkinitcpio.d/default.conf"
+    fi
+}
+
+
 function raptor_kerns_post() {
     sleep 2 && clear
     echo "Kernel module configuration"
-
+    raptor_kerns_post_grap
 }
 
 function raptor_neter_post_srvc() {
