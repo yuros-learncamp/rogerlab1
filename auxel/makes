@@ -73,7 +73,7 @@ function raptor_disks_make_root() {
     local sizes=$distro_procsize
 
     echo "root path: $rootpath"
-    echo "root label: $label"
+    echo "root label: $( lsblk -o path,label | grep "ROOT"  )"
     echo "root paths: $paths"
     exit 0
 
