@@ -46,7 +46,7 @@ function raptor_disks_init() {
 ## MAKE PARTITION
 function raptor_disks_make_boot() {
 
-    local label=$( lsblk -o label | grep "BOOT" | awk '{print $1}' )
+    local label=$( lsblk -o path,label | grep "BOOT" | awk '{print $1}' )
     local paths=$( lsblk -o path  | grep $bootpath )
     local sizes=$distro_bootsize
 
@@ -103,7 +103,7 @@ function raptor_disks_make_root() {
 
 function raptor_disks_make_swap() {
 
-    local label=$( lsblk -o label | grep "swap" | awk '{print $1}' )
+    local label=$( lsblk -o path,label | grep "swap" | awk '{print $1}' )
     local paths=$( lsblk -o path | grep $swappath )
     local sizes=$distro_swapsize
 
@@ -124,7 +124,7 @@ function raptor_disks_make_swap() {
 
 function raptor_disks_make_home() {
 
-    local label=$( lsblk -o label | grep "HOME" | awk '{print $1}' )
+    local label=$( lsblk -o path,label | grep "HOME" | awk '{print $1}' )
     local paths=$( lsblk -o path | grep $homepath )
     local sizes=$distro_homesize
 
