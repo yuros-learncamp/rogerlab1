@@ -538,7 +538,7 @@ function raptor_boots_post_secu() {
     arch-chroot /mnt sbctl reset &&
     arch-chroot /mnt sbctl create-keys &&
    
-    if [[ -n $uefipath == true ]];then
+    if [[ -n $uefipath ]];then
         arch-chroot /mnt sbctl enroll-keys -i -m
     else
         arch-chroot /mnt sbctl enroll-keys -i -f
