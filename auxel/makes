@@ -152,8 +152,7 @@ function raptor_firms_prep_nvidi_vali() {
         ;;
     esac
 
-    echo "Nvidia firm: $gpuDriver"
-    echo "Nvidia gens: $gpuGen"
+ 
 }
 
 function raptor_firms_prep_nvidi_open() {
@@ -161,6 +160,9 @@ function raptor_firms_prep_nvidi_open() {
     if [[ $gpuDriver != "manual" ]];then
         return
     fi
+
+    echo "Nvidia firm: $gpuDriver"
+    echo "Nvidia gens: $gpuGen"
 
     echo "nvidia-open-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd" >> "$raptor_packer"
 
