@@ -538,7 +538,7 @@ function raptor_boots_post_secu() {
     fi
 
     arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
-    sleep 1
+    sleep 2
 }
 
 ## boot loader @al muhdil karim <karim@yuros.org>, @achmad baihaqi <achmad@yuros.org>, @ibnu dzaky <dzaky@yuros.org>
@@ -548,13 +548,13 @@ function raptor_boots_post_boot() {
     echo "root=$rootpath" > /mnt/etc/cmdline.d/01-boot.conf && 
     bootctl --boot-path=/mnt/boot/ --esp-path=/mnt/boot/efi --efi-boot-option-description=$ID install
     echo "installation systemd boot"
-    sleep 1
+    sleep 2
 }
 
 function raptor_boots_post_srvc() {
     echo "enable boot service"
     arch-chroot /mnt systemctl enable systemd-boot-update.service
-    sleep 1
+    sleep 2
 }
 
 function raptor_boots_post() {
