@@ -62,6 +62,9 @@ function raptor_firms_prep_firms() {
     if [[ ! -z $( lspci | grep 'Realtek') ]];then
         echo "linux-firmware-realtek" >> "$raptor_packer"
     fi
+
+    echo "linux-firmware-other" >> "$raptor_packer"
+     
 }
 
 function raptor_firms_prep_graph_nvid() {
