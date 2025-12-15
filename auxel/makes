@@ -8,31 +8,11 @@ function raptor_disks_init_pure() {
     fi
 }
 
-## dualboot validator team # @Al Muhdil Karim <karim@yuros.org> @Fawaz Rifqi Frasetia <fras@yuros.org>
-function raptor_disks_init_dual() {
-    
-    dualboot=false
-    efipaths=($(lsblk -o path,fstype | grep vfat | awk '{print $1}'))
-
-    for item_efipath in "${efipaths[@]}"; do
-
-        echo "check efi partition at $item_efipath" 
-        sudo mount $item_efipath /srv && sleep 2 && 
-
-        if [[ -d "/srv/EFI/Microsoft" ]]; then
-            dualboot=true &&
-            uefipath="$item_efipath" && 
-            echo "windows efi partition : $item_efipath"
-        fi
-        sleep 1 && sudo umount -R /srv && sleep 2
-
-    done
-}
 
 function raptor_disks_init_swip() {
 
-    if [[ -n $uefipath ]];then
-        local pathuefi=$( lsblk -o path,label | grep $uefipath )
+    if [[ -n $bootpath ]];then
+        local pathboot=$( lsblk -o path,label | grep $bootpath )
     fi
 
     if [[ -n $rootpath ]];then
@@ -47,7 +27,7 @@ function raptor_disks_init_swip() {
         local pathhome=$( lsblk -o path,label | grep $homepath )
     fi
 
-    if [[ $dualboot == false ]]&&[[ -z $pathuefi ]]&&[[ -z $pathroot ]]&&[[ -z $pathswap ]]&&[[ -z $pathhome ]];then
+    if [[ $dualboot == false ]]&&[[ -z $pathboot ]]&&[[ -z $pathroot ]]&&[[ -z $pathswap ]]&&[[ -z $pathhome ]];then
 
         read -p "Do yout want swipe partition table : [y/N] " swipe_partition_table
 
@@ -61,7 +41,6 @@ function raptor_disks_init_swip() {
 
 function raptor_disks_init() {
     raptor_disks_init_pure
-    raptor_disks_init_dual
     raptor_disks_init_swip
 }
 
@@ -87,26 +66,20 @@ function raptor_disks_make_boot() {
     fi
 }
 
+## dualboot validator team # @Al Muhdil Karim <karim@yuros.org> @Fawaz Rifqi Frasetia <fras@yuros.org>
 function raptor_disks_make_uefi() {
 
-    if [[ $dualboot == true ]];then
-        return
-    fi 
+    efipaths=($(lsblk -o path,fstype | grep vfat | awk '{print $1}'))
 
-    local label=$( lsblk -o label | grep "UEFI" | awk '{print $1}' )
-    local paths=$( lsblk -o path  | grep $uefipath )
-    local sizes=$distro_uefisize
+    for path in "${efipaths[@]}"; do
+        sudo mount $path /srv && sleep 2 && 
 
-    echo "prepare uefi partition"
-
-    if [[ -n $paths ]];then
-        uefipath=$paths
-    elif [[ -n $label ]];then
-        uefipath=$label
-    else
-        echo "error uefi partition not found"
-        exit 1
-    fi
+        if [[ -d "/srv/EFI/Microsoft" ]]; then
+            uefipath="$path" && 
+            echo "found efi : $path"
+        fi
+        sleep 1 && sudo umount -R /srv && sleep 2
+    done
 }
 
 function raptor_disks_make_root() {
@@ -267,6 +240,7 @@ function raptor_disks_mont_swap() {
 
 function raptor_disks_mont() {
     raptor_disks_mont_root &&
+    raptor_disks_mont_uefi &&
     raptor_disks_mont_boot &&
     raptor_disks_mont_home &&
     raptor_disks_mont_swap
@@ -279,7 +253,8 @@ function raptor_disks_prep() {
     raptor_disks_prev &&
     raptor_disks_form &&
     raptor_disks_mont &&
-     echo "configration done"
+    echo "configration done"
+    exit
 }
 
 
@@ -497,58 +472,32 @@ function raptor_boots_post_prep() {
 }
 
 ## secure boot @al muhdil karim <karim@yuros.org>, @muhmmad haydar kamil <kamil@yuros.org>, @sultan fajar ramadhan <sultan@yuros.org>
-function raptor_boots_post_secs() {
+function raptor_boots_post_secu() {
 
     echo "setup secure boot"
+    arch-chroot /mnt sbctl reset &&
     arch-chroot /mnt sbctl create-keys &&
-    arch-chroot /mnt sbctl enroll-keys -m -i -f &&
+   
+    if [[ -n $uefipath == true ]];then
+        arch-chroot /mnt sbctl enroll-keys -i -m
+    else
+        arch-chroot /mnt sbctl enroll-keys -i -f
+    fi
+
     arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
-
-    #if [[ $dualboot == true ]];then
-    #    local_kernpath="sbctl sign -s -o /boot/efi/EFI/linux/$kernel_type"
-    #else
-    #    local_kernpath="sbctl sign -s -o /boot/efi/linux/$kernel_type"
-    #fi
-
-    #arch-chroot /mnt $local_kernpath 
 }
 
 ## boot loader @al muhdil karim <karim@yuros.org>, @achmad baihaqi <achmad@yuros.org>, @ibnu dzaky <dzaky@yuros.org>
 function raptor_boots_post_boot() {
-    echo "kernel parameter boot configuration"
+    echo "setup systemd boot"
+    source /mnt/usr/lib/os-release
     echo "root=$rootpath" > /mnt/etc/cmdline.d/01-boot.conf && 
-    
-    if [[ $dualboot == true ]];then
-        bootctl --path=/mnt/boot/efi install
-        mv -f /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak
-        cp /mnt/boot/efi/EFI/systemd/systemd-bootx64.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
-        arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$| arch-chroot /mnt sbctl sign -s "\1"|e'
-    else
-        rm -fr /boot/efi/loader &&
-        bootctl --path=/mnt/boot install
-    fi
-
+    bootctl --boot-path=/mnt/boot/ --esp-path=/mnt/boot/efi --efi-boot-option-description=$ID install
     echo "installation systemd boot"
-
-}
-
-function raptor_boots_post_boot_old() {
-    echo "kernel parameter boot configuration"
-    echo "root=$rootpath" > /mnt/etc/cmdline.d/01-boot.conf && 
-    echo "installation systemd boot"
-
-    if [[ $dualboot == true ]];then
-        bootctl --path=/mnt/boot/efi install
-        mv -f /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi.bak
-        cp /mnt/boot/efi/EFI/systemd/systemd-bootx64.efi /mnt/boot/efi/EFI/Microsoft/Boot/bootmgfw.efi
-        arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$| arch-chroot /mnt sbctl sign -s "\1"|e'
-    else
-        rm -fr /boot/efi/loader &&
-        bootctl --path=/mnt/boot install
-    fi
 }
 
 function raptor_boots_post_srvc() {
+     echo "enable boot service"
     arch-chroot /mnt systemctl enable systemd-boot-update.service
 }
 
@@ -556,7 +505,7 @@ function raptor_boots_post() {
     sleep 2 && clear
     echo "Booting module configuration"
     raptor_boots_post_prep
-    raptor_boots_post_secs
+    raptor_boots_post_secu
     raptor_boots_post_boot
     raptor_boots_post_srvc
 }
