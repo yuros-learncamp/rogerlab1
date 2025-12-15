@@ -69,18 +69,6 @@ function raptor_firms_prep_firms() {
 
 
 function raptor_firms_prep_nvidi_vali() {
-    
-}
-
-
-function raptor_firms_prep_nvidi() {
-
-    if [[ -z $(lspci | grep '3d\|NVIDIA') ]];then
-        return
-    fi
-
-    function raptor_firms_post_prep() {
-    echo "nvidia"
 
     # Default values
     gpuGen="Unknown"
@@ -164,7 +152,49 @@ function raptor_firms_prep_nvidi() {
         gpuDriver="unidentified"
         ;;
     esac
+}
 
+function raptor_firms_prep_nvidi_black() {
+    echo "open"
+}
+
+function raptor_firms_prep_nvidi_hoppe() {
+    echo "open"
+}
+
+function raptor_firms_prep_nvidi_lovel() {
+    echo "open"
+}
+
+function raptor_firms_prep_nvidi_amper() {
+    echo "open"
+}
+
+function raptor_firms_prep_nvidi_turin() {
+    echo "open"
+}
+
+function raptor_firms_prep_nvidi_volta() {
+    echo "open"
+}
+
+function raptor_firms_prep_nvidi_pasca() {
+    echo "open"
+}
+
+function raptor_firms_prep_nvidi_maxwe() {
+    echo "open"
+}
+
+function raptor_firms_prep_nvidi() {
+
+    if [[ -z $(lspci | grep '3d\|NVIDIA') ]];then
+        return
+    fi
+
+    raptor_firms_prep_nvidi_vali
+    raptor_firms_prep_nvidi_open
+    raptor_firms_prep_nvidi_main
     echo "nvidia-utils" >> "$raptor_packer"
 }
 
