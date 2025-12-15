@@ -190,9 +190,8 @@ function raptor_firms_prep_nvidi() {
         return
     fi
 
-
-    raptor_firms_prep_nvidi_vali
-    raptor_firms_prep_nvidi_open
+    raptor_firms_prep_nvidi_vali &&
+    raptor_firms_prep_nvidi_open &&
     raptor_firms_prep_nvidi_dkms
     gpudriver="nvidia"
 }
