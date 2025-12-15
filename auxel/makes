@@ -175,26 +175,37 @@ function raptor_firms_prep_nvidi_turin() {
 }
 
 function raptor_firms_prep_nvidi_volta() {
-    echo "open"
+
+    if [[ $gpuGen != "Volta" ]];then
+        return
+    fi
+
+    echo "nvidia-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd lib32-nvidia-utils lib32-opencl-nvidia"
 }
 
 function raptor_firms_prep_nvidi_pasca() {
-    echo "open"
+    echo "nvidia-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd lib32-nvidia-utils lib32-opencl-nvidia"
 }
 
 function raptor_firms_prep_nvidi_maxwe() {
-    echo "open"
+    echo "nvidia-dkms nvidia-utils opencl-nvidia nvidia-settings libglvnd lib32-nvidia-utils lib32-opencl-nvidia"
 }
+
 
 function raptor_firms_prep_nvidi() {
 
     if [[ -z $(lspci | grep '3d\|NVIDIA') ]];then
         return
     fi
+    raptor_firms_prep_nvidi_black
+    raptor_firms_prep_nvidi_hoppe
+    raptor_firms_prep_nvidi_lovel
+    raptor_firms_prep_nvidi_amper
+    raptor_firms_prep_nvidi_turin
+    raptor_firms_prep_nvidi_volta
+    raptor_firms_prep_nvidi_pasca
+    raptor_firms_prep_nvidi_maxwe
 
-    raptor_firms_prep_nvidi_vali
-    raptor_firms_prep_nvidi_open
-    raptor_firms_prep_nvidi_main
     echo "nvidia-utils" >> "$raptor_packer"
 }
 
@@ -785,7 +796,7 @@ function raptor_boots_post_secu() {
 function raptor_boots_post_boot() {
     echo "setup systemd boot"
     source /mnt/usr/lib/os-release
-    echo "root=$rootpath" > /mnt/etc/cmdline.d/01-boot.conf && 
+    echo "root=$procpath" > /mnt/etc/cmdline.d/01-boot.conf && 
     bootctl --path=/mnt/boot/ --efi-boot-option-description=$ID install
     echo "installation systemd boot"
     sleep 2
