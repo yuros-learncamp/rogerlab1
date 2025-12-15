@@ -1,5 +1,105 @@
 #!/bin/bash
 
+function raptor_firms_prep_bluez() {
+    if [[ -n $( rfkill | grep bluetooth ) ]];then
+        echo "bluez" >> "$raptor_packer"
+    fi
+}
+
+function raptor_firms_prep_ucode() {
+    pack_ucodes=$(grep "vendor_id" /proc/cpuinfo | head -n 1 | awk '{print $3}')
+
+    if [[ "$pack_ucodes" == "GenuineIntel" ]]; then
+        echo "intel-ucode" >> "$raptor_packer"
+    elif [[ "$pack_ucodes" == "AuthenticAMD" ]]; then
+        echo "amd-ucode"   >> "$raptor_packer"
+    fi
+}
+
+function raptor_firms_prep_iwctl() {
+
+    if [[ -z $( cat $raptor_packer | grep "networkmanager" ) ]]&&[[ -z $( cat $raptor_packer | grep "connman" ) ]];then
+        if [[ -n $( rfkill | grep wireless ) ]];then
+            echo "iwd" >> "$pack_pacman"
+        fi
+    fi
+}
+
+function raptor_firms_prep_firms() {
+
+    if [[ ! -z $( lspci | grep 'AMD\|Amd') ]];then
+        echo "linux-firmware-amdgpu" >> "$pack_pacman"
+    fi
+
+    if [[ ! -z $( lspci | grep 'Atheros\|ATHEROS') ]];then
+        echo "linux-firmware-atheros" >> "$pack_pacman"
+    fi
+
+    if [[ ! -z $( lspci | grep 'Broadcom\|BROADCOM\|Cypress') ]];then
+        echo "linux-firmware-broadcom" >> "$pack_pacman"
+    fi
+
+    if [[ ! -z $( lspci | grep 'Cirrus\|CIRRUS') ]];then
+        echo "linux-firmware-cirrus" >> "$pack_pacman"
+    fi
+
+    if [[ ! -z $( lspci | grep 'Intel\|INTEL') ]];then
+        echo "linux-firmware-intel" >> "$pack_pacman"
+    fi
+
+    if [[ ! -z $( lspci | grep 'MediaTek\|Ralink') ]];then
+        echo "linux-firmware-mediatek" >> "$pack_pacman"
+    fi
+
+    if [[ ! -z $( lspci | grep 'NVIDIA\|Nvidia') ]];then
+        echo "linux-firmware-nvidia " >> "$pack_pacman"
+    fi
+
+    if [[ ! -z $( lspci | grep 'ATI\|Radeon') ]];then
+        echo "linux-firmware-radeon " >> "$pack_pacman"
+    fi
+
+    if [[ ! -z $( lspci | grep 'Realtek') ]];then
+        echo "linux-firmware-realtek " >> "$pack_pacman"
+    fi
+}
+
+function raptor_firms_prep_graph_nvid() {
+    echo "nvidia";
+}
+
+function raptor_firms_prep_graph_rads() {
+    echo "nvidia";
+}
+
+function raptor_firms_prep_graph_inte() {
+    echo "intel";
+}
+
+function raptor_firms_prep_graph() {
+
+    if [[ ! -z $( lspci | grep 'VGA' | grep 'Intel Corporation') ]];then
+        echo "vulkan-intel" >> "$pack_pacman"
+    fi
+
+    if [[ ! -z $(lspci | grep '3d\|NVIDIA') ]];then
+        echo "nvidia-utils" >> "$pack_pacman"
+        pacstrap /mnt nvidia-utils
+    fi
+
+    if [[ ! -z $(lspci | grep '3d\|RADEON') ]];then
+        echo "nvidia-radeon" >> "$pack_pacman"
+    fi
+}
+
+function raptor_firms_prep() {
+    raptor_firms_prep_bluez
+    raptor_firms_prep_ucode
+    raptor_firms_prep_iwctl
+    raptor_firms_prep_firms
+    raptor_firms_prep_graph
+}
+
 ## PREP PARTITION
 function raptor_disks_init_pure() {
     local ismounted=$( lsblk -o lsblk -o path,mountpoint | grep "/mnt" )
@@ -337,6 +437,10 @@ function raptor_cores_prep() {
     raptor_cores_prep_mulibs &&
     raptor_cores_prep_pacmir &&
     craine_cores_post_config
+}
+
+function raptor_firms_post() {
+    echo "firmware post"
 }
 
 function craine_cores_post_host() {
