@@ -24,7 +24,7 @@ function raptor_firms_prep_iwctl() {
     if [[ -z $( cat $raptor_packer | grep "networkmanager" ) ]]&&[[ -z $( cat $raptor_packer | grep "connman" ) ]]&&[[ -n $( rfkill | grep wireless ) ]];then
         echo "iwd" >> "$raptor_packer"
         echo "iwd module loaded"
-     fi
+    fi
 }
 
 function raptor_firms_prep_firms() {
