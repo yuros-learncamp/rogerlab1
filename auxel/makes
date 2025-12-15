@@ -431,14 +431,14 @@ function raptor_disks_mont_proc() {
 
 function raptor_disks_mont_boot() {
     mount -o uid=0,gid=0,dmask=007,fmask=007 $bootpath /mnt/boot
-    mkdir -p /mnt/boot/{EFI,kernel,loader}
-    mkdir -p /mnt/boot/EFI/{linux,systemd}
+    mkdir -p /mnt/boot/{efi,kernel,loader}
+    mkdir -p /mnt/boot/efi/{linux,systemd}
 }
 
 function raptor_disks_mont_uefi() {
     if [[ -n $uefipath ]];then
         mount $uefipath /srv && sleep 1
-        sudo cp -r /srv/EFI/Microsoft /mnt/boot/EFI/ && sleep 1
+        sudo cp -r /srv/EFI/Microsoft /mnt/boot/efi/ && sleep 1
         umount -R /srv && sleep 1
     fi
 }
@@ -624,25 +624,10 @@ function raptor_disks_post() {
     echo "Partition configuration"
 }
 
-function raptor_kerns_post_conf() {
-    
-    echo "dualboot : $dualboot"
-    if [[ $dualboot == true ]];then
-        echo "prepare dual boot kernel preset"
-        mv /mnt/etc/mkinitcpio.d/linux-zen-dual.preset /mnt/etc/mkinitcpio.d/linux-zen.preset
-        rm /mnt/etc/mkinitcpio.d/linux-zen-mono.preset
-    else
-        echo "prepare single boot kernel preset"
-        mv /mnt/etc/mkinitcpio.d/linux-zen-mono.preset /mnt/etc/mkinitcpio.d/linux-zen.preset
-        rm /mnt/etc/mkinitcpio.d/linux-zen-dual.preset
-    fi
-}
-
-
 function raptor_kerns_post() {
     sleep 2 && clear
     echo "Kernel module configuration"
-    raptor_kerns_post_conf
+
 }
 
 function raptor_neter_post_srvc() {
@@ -768,7 +753,8 @@ function raptor_boots_post_secu() {
         echo "enroll device boot keys" && sleep 1
     fi
 
-    arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
+    arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi &&
+    arch-chroot /mnt sbctl verify | sed -E 's|^.* (/.+) is not signed$| arch-chroot /mnt sbctl sign -s "\1"|e' &&
     echo "signing systemd-boot efi file" && sleep 2
 }
 
