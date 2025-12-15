@@ -175,9 +175,9 @@ function raptor_disks_form_boot() {
     mkfs.vfat -F32 -S 4096 -n "BOOT" $bootpath
 }
 
-function raptor_disks_form_root() {
+function raptor_disks_form_proc() {
     echo "format root partition"
-    mkfs.ext4 -F -q -b 4096 -L "ROOT" $rootpath
+    mkfs.ext4 -F -q -b 4096 -L "ROOT" $procpath
 }
 
 function raptor_disks_form_swap() {
@@ -196,15 +196,15 @@ function raptor_disks_form_home() {
 
 function raptor_disks_form() {
     raptor_disks_form_boot &&
-    raptor_disks_form_root &&
+    raptor_disks_form_proc &&
     raptor_disks_form_swap &&
     raptor_disks_form_home
 }
 
 ## MONT PARTITION
-function raptor_disks_mont_root() {
+function raptor_disks_mont_proc() {
     echo "mount root partition"
-    mount $rootpath /mnt
+    mount $procpath /mnt
     mkdir -p /mnt/{home,boot}
 }
 
@@ -234,9 +234,9 @@ function raptor_disks_mont_swap() {
 }
 
 function raptor_disks_mont() {
-    raptor_disks_mont_root &&
-    raptor_disks_mont_uefi &&
+    raptor_disks_mont_proc &&
     raptor_disks_mont_boot &&
+    raptor_disks_mont_uefi &&
     raptor_disks_mont_home &&
     raptor_disks_mont_swap
 }
