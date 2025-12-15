@@ -521,7 +521,7 @@ function raptor_boots_post_prep() {
     echo "clean initramfs"
     test -e /mnt/boot/initramfs*  && rm -f /mnt/boot/initramfs*
 
-    arch-chroot /mnt mkinitcpio -P
+    sleep 1
 }
 
 ## secure boot @al muhdil karim <karim@yuros.org>, @muhmmad haydar kamil <kamil@yuros.org>, @sultan fajar ramadhan <sultan@yuros.org>
@@ -538,6 +538,7 @@ function raptor_boots_post_secu() {
     fi
 
     arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
+    sleep 1
 }
 
 ## boot loader @al muhdil karim <karim@yuros.org>, @achmad baihaqi <achmad@yuros.org>, @ibnu dzaky <dzaky@yuros.org>
@@ -547,19 +548,21 @@ function raptor_boots_post_boot() {
     echo "root=$rootpath" > /mnt/etc/cmdline.d/01-boot.conf && 
     bootctl --boot-path=/mnt/boot/ --esp-path=/mnt/boot/efi --efi-boot-option-description=$ID install
     echo "installation systemd boot"
+    sleep 1
 }
 
 function raptor_boots_post_srvc() {
     echo "enable boot service"
     arch-chroot /mnt systemctl enable systemd-boot-update.service
+    sleep 1
 }
 
 function raptor_boots_post() {
     sleep 2 && clear
     echo "Booting module configuration"
-    raptor_boots_post_prep
-    raptor_boots_post_secu
-    raptor_boots_post_boot
+    raptor_boots_post_prep &&
+    raptor_boots_post_secu &&
+    raptor_boots_post_boot && 
     raptor_boots_post_srvc
 }
 
